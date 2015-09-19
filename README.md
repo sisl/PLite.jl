@@ -10,7 +10,7 @@ An MDP is typically defined by the tuple (*S*, *A*, *T*, *R*), where
 
 * *S* is the state space
 * *A* is the action space
-* *T*(*s*, *a*, *s*') is the transition function that gives the probability of reaching state *s*' from state s by taking action $a$
+* *T*(*s*, *a*, *s*') is the transition function that gives the probability of reaching state *s*' from state s by taking action *a*
 * *R*(*s*, *a*) is the reward function that gives a scalar value for taking action *a* at state *s*.
 
 #### State space
