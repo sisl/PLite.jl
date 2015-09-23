@@ -160,14 +160,14 @@ transition!(mdp,
 
     if move == "E"
       return [
-        (x, goal, 0.2),
-        (x - 1, isgoal(x - 1), 0.2),
-        (x + 1, isgoal(x + 1), 0.6)]
+        ([x, goal], 0.2),
+        ([x - 1, isgoal(x - 1)], 0.2),
+        ([x + 1, isgoal(x + 1)], 0.6)
     elseif move == "W"
       return [
-        (x, goal, 0.2),
-        (x - 1, isgoal(x - 1), 0.6),
-        (x + 1, isgoal(x + 1), 0.2)]
+        ([x, goal], 0.2),
+        ([x - 1, isgoal(x - 1)], 0.6),
+        ([x + 1, isgoal(x + 1)], 0.2)]
     end
   end
 )

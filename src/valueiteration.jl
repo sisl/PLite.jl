@@ -89,7 +89,7 @@ end
 
 function lazyCheck(mdp::MDP, vi::ValueIteration)
   checkDiscretize(mdp, vi)
-  checkTransition(mdp, vi)
+  checkTransition(mdp)
 end
 
 # Check that all |mdp| RangeVar variables have valid discretization schemes in |vi|
@@ -126,32 +126,63 @@ function checkDiscretize(mdp::MDP, vi::ValueIteration)
 end
 
 # Check transition function with a few random examples for correct input types, return types and corresponding probability or state variable value boundedness
-function checkTransition(mdp::MDP, vi::ValueIteration)
+function checkTransition(mdp::MDP)
   args = randargs(mdp)
   transitionval = mdp.transition.fn(args...)
-  if isa(transitionval, Float64)  # T(s,a,s')
-    if transitionval < 0.0 || transitionval > 1.0
-      warn(string(  # warn not error because we might have sampled a non-existent state
-        "transition function provided is of type T(s,a,s'), ",
-        "but the value returned from a random state is not ",
+  checkTransition(mdp, args, transitionval)
+end
+
+function checkTransition(mdp::MDP, args::Vector, transitionval::Float64)
+  if transitionval < 0.0 || transitionval > 1.0
+    warn(string(  # warn not error because we might have sampled a non-existent state
+      "transition function provided is of type T(s,a,s'), ",
+      "but the value returned from a random state is not ",
+      "a valid probability value bounded to [0,1]\n",
+      "argument names: ", mdp.transition.argnames, "\n",
+      "random state: ", args, "\n",
+      "return value: ", transitionval))
+  end
+end
+
+function checkTransition(mdp::MDP, args::Vector, transitionval::Vector)
+  nargs = length(mdp.transition.argnames)
+  sumprob = 0.0
+
+  for returnval in transitionval  # |returnval| is a (state, prob) pair
+    state = returnval[1]
+    prob = returnval[2]
+    sumprob += prob
+
+    if length(state) != nargs || !isvalid(mdp, state)
+      error(string(
+        "transition function provided is of type T(s,a), ",
+        "but one of the states returned from a random state is ",
+        "either not bounded by its range or not in the set of values\n",
+        "argument names: ", mdp.transition.argnames, "\n",
+        "random state: ", args, "\n",
+        "return value: ", state, "\n",
+        "probability: ", prob))
+    elseif prob < 0.0 || prob > 1.0
+      error(string(
+        "transition function provided is of type T(s,a), ",
+        "but one of the probabilities returned from a random state is ",
         "a valid probability value bounded to [0,1]\n",
         "argument names: ", mdp.transition.argnames, "\n",
         "random state: ", args, "\n",
-        "return value: ", transitionval))
+        "return value: ", state, "\n",
+        "probability: ", prob))
     end
-  else isa(transitionval, Vector)  # T(s,a)
-    nargs = length(mdp.transition.argnames)
-    for returnval in transitionval
-      if length(returnval) != nargs || !isvalid(mdp, returnval)
-        error(string(
-          "transition function provided is of type T(s,a), ",
-          "but one of the values returned from a random state is not ",
-          "a valid state either bounded by its range or set of values\n",
-          "argument names: ", mdp.transition.argnames, "\n",
-          "random state: ", args, "\n",
-          "return value: ", returnval))
-      end
-    end
+  end
+
+  if sumprob != 1.0
+    warn(string(  # warn not error because we might have sampled a non-existent state
+      "transition function provided is of type T(s,a), ",
+      "but the sum of transition probabilities returned from a random state ",
+      "does not sum to 1.0\n",
+      "argument names: ", mdp.transition.argnames, "\n",
+      "random state: ", args, "\n",
+      "return value: ", returnval, "\n",
+      "sum of transition probabilities: ", sumprob))
   end
 end
 
@@ -181,7 +212,7 @@ function lazySample(lazyvar::LazyVar)
   end
 end
 
-function isvalid(mdp::MDP, state::Tuple)
+function isvalid(mdp::MDP, state::Vector)
   for iarg in length(mdp.transition.argnames)
     argname = mdp.transition.argnames[iarg]
     if isa(mdp.statemap[argname], RangeVar) &&
