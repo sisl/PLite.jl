@@ -69,6 +69,7 @@ statevariable!(mdp, "goal", ["yes", "no"])  # discrete
 actionvariable!(mdp, "move", ["N", "S", "E", "W", "stop"])  # discrete
 
 transition!(mdp,
+  ["x", "y", "goal", "move", "x", "y", "goal"],  # note |xp| is an "x" variable
   function mytransition(
       x::Float64,
       y::Float64,
@@ -100,6 +101,7 @@ transition!(mdp,
 )
 
 reward!(mdp,
+  ["x", "y", "goal", "move"],
   function myreward(
       x::Float64,
       y::Float64,
@@ -142,6 +144,7 @@ statevariable!(mdp, "goal", ["yes", "no"])  # discrete
 actionvariable!(mdp, "move", ["E", "W", "stop"])  # discrete
 
 transition!(mdp,
+  ["x", "goal", "move"],
   function mytransition(x::Float64, goal::String, move::String)
     function isgoal(x::Float64)
       if x == MaxX
@@ -170,6 +173,7 @@ transition!(mdp,
 )
 
 reward!(mdp,
+  ["x", "goal", "move"],
   function myreward(x::Float64, goal::String, move::String)
     if (goal == "yes")
       return 1

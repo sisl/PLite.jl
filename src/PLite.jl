@@ -57,11 +57,11 @@ end
 type LazyFunc
 
   empty::Bool
-  fn::Function
   argnames::Vector{String}
+  fn::Function
 
-  LazyFunc() = new(true, function emptyfunc() end, Array(String, 0))
-  LazyFunc(fn::Function, argnames::Vector{String}) = new(false, fn, argnames)
+  LazyFunc() = new(true, Array(String, 0), function emptyfunc() end)
+  LazyFunc(argnames::Vector{String}, fn::Function) = new(false, argnames, fn)
 
 end
 
@@ -117,23 +117,23 @@ function actionvariable!(mdp::MDP, varname::String, values::Vector)
 end
 
 # |argnames| is an ordered list of argument names for |transition|
-function transition!(mdp::MDP, transition::Function, argnames::Vector{String})
+function transition!(mdp::MDP, argnames::Vector{String}, transition::Function)
   if !mdp.transition.empty
     warn(string(
       "transition function already exists in MDP object, ",
       "replacing existing function definition"))
   end
-  mdp.transition = LazyFunc(transition, argnames)
+  mdp.transition = LazyFunc(argnames, transition)
 end
 
 # |argnames| is an ordered list of argument names for |reward|
-function reward!(mdp::MDP, reward::Function, argnames::Vector{String})
+function reward!(mdp::MDP, argnames::Vector{String}, reward::Function)
   if !mdp.reward.empty
     warn(string(
       "reward function already exists in MDP object, ",
       "replacing existing function definition"))
   end
-  reward.transition = LazyFunc(reward, argnames)
+  reward.transition = LazyFunc(argnames, reward)
 end
 
 function solve!(mdp::MDP, solver::Solver)
