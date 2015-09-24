@@ -328,7 +328,8 @@ function getspace(
     elseif isa(lazy, ValuesVar)
       space[ivar] = lazy.values
     else
-      error(string("unknown state/action variable definition type for ", statevar))
+      error(string(
+        "unknown state/action variable definition type for ", var))
     end
   end
   return space
