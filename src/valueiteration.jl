@@ -1,3 +1,5 @@
+using GridInterpolations
+
 export
   SerialValueIteration,
   ParallelValueIteration,
@@ -13,13 +15,24 @@ type SerialValueIteration <: ValueIteration
   maxiter::Int64
   tol::Float64
   verbose::Bool
-  discretizemap::Dict{String, LazyDiscrete}
+
+  statemap::Dict{String, LazyDiscrete}
+  actionmap::Dict{String, LazyDiscrete}
+  stategrid::RectangleGrid
+  actiongrid::RectangleGrid
 
   SerialValueIteration(
       maxiter::Int64=MaxIter,
       tol::Float64=Tol,
       verbose::Bool=false) =
-    new(maxiter, tol, verbose, Dict{String, LazyDiscrete}())
+    new(
+      maxiter,
+      tol,
+      verbose,
+      Dict{String, LazyDiscrete}(),
+      Dict{String, LazyDiscrete}(),
+      RectangleGrid(),
+      RectangleGrid())
 
 end
 
@@ -28,8 +41,11 @@ type ParallelValueIteration <: ValueIteration
   maxiter::Int64
   tol::Float64
   verbose::Bool
+
   statemap::Dict{String, LazyDiscrete}
   actionmap::Dict{String, LazyDiscrete}
+  stategrid::RectangleGrid
+  actiongrid::RectangleGrid
 
   ParallelValueIteration(
       maxiter::Int64=MaxIter,
@@ -40,7 +56,9 @@ type ParallelValueIteration <: ValueIteration
       tol,
       verbose,
       Dict{String, LazyDiscrete}(),
-      Dict{String, LazyDiscrete}())
+      Dict{String, LazyDiscrete}(),
+      RectangleGrid(),
+      RectangleGrid())
 
 end
 
@@ -89,6 +107,7 @@ end
 
 function lazyCheck(mdp::MDP, vi::ValueIteration)
   checkDiscretize(mdp, vi)
+  checkArgumentOrder(mdp)
   checkTransition(mdp)
 end
 
@@ -125,11 +144,57 @@ function checkDiscretize(mdp::MDP, vi::ValueIteration)
 
 end
 
-# Check transition function with a few random examples for correct input types, return types and corresponding probability or state variable value boundedness
+function checkArgumentOrder(mdp::MDP)
+
+  statedim = length(mdp.statemap)
+  actiondim = length(mdp.actionmap)
+
+  ntransitionargs = length(mdp.transition.argnames)
+  nrewardargs = length(mdp.reward.argnames)
+
+  sadim = statedim + actiondim
+  saspdim = sadim + statedim
+
+  if sadim != nrewardargs
+    error(string(
+      "the number of reward function input arguments must be the same as ",
+      "the sum of the number of state and action variables"))
+  elseif saspdim != ntransitionargs
+    error(string(
+      "the number of transition function input arguments must be the same as ",
+      "the sum of the number of state, action, and next state variables"))
+  end
+
+  for iarg in 1:nrewardargs
+    if mdp.reward.argnames[iarg] != mdp.transition.argnames[iarg]
+      error(string(
+        "transition and reward function state and action variable input arguments"
+        "must be consistent in both naming and order"))
+    end
+  end
+
+  if length(mdp.transition.argnames) > length(mdp.reward.argnames)
+    for iarg in 1:nrewardargs - actiondim
+      if mdp.transition.argnames[iarg] != mdp.transition.argnames[iarg + sadim]
+        error(string(
+          "transition type T(s,a,s')'s state s and next state s' variable "
+          "input arguments must be consistent in both naming and order"))
+      end
+    end
+  end
+
+end
+
 function checkTransition(mdp::MDP)
   args = randargs(mdp)
   transitionval = mdp.transition.fn(args...)
-  checkTransition(mdp, args, transitionval)
+  if isa(transitionval, Float64) || isa(transitionval, Vector)
+    checkTransition(mdp, args, transitionval)
+  else
+    error(string(
+      "transition function provided is not a correctly defined ",
+      "T(s,a,s') or T(s,a) type function, check the return type"))
+  end
 end
 
 function checkTransition(mdp::MDP, args::Vector, transitionval::Float64)
@@ -228,9 +293,45 @@ function isvalid(mdp::MDP, state::Vector)
 end
 
 function lazySolve!(mdp::MDP, vi::ValueIteration)
-  # todo: figure out whether T(s,a,s') or T(s,a) type transition
-  # todo: if T(s,a), use gridinterpolations
-  # todo: dispatch to serial or parallel value iteration solvers
+  statespace, actionspace = getspaces(mdp, vi)
+  vi.stategrid = RectangleGrid(statespace...)
+  vi.actiongrid = RectangleGrid(actionspace...)
+  solve(mdp, vi)
+end
+
+function getspaces(mdp::MDP, vi::ValueIteration)
+  statedim = length(mdp.statemap)
+  actiondim = length(mdp.actionmap)
+
+  stateargs = mdp.reward.argnames[1:statedim]
+  actionargs = mdp.reward.argnames[1 + statedim:end]
+
+  statespace = getspace(statedim, stateargs, mdp.statemap, vi.statemap)
+  actionspace = getspace(actiondim, actionargs, mdp.actionmap, vi.actionmap)
+
+  return statespace, actionspace
+end
+
+function getspace(
+    dim::Int64,
+    args::Vector{String},
+    lazymap::Dict{String, LazyVar},
+    discmap::Dict{String, LazyDiscrete})
+
+  space = Array(Vector, dim)
+  for ivar in 1:length(args)
+    var = args[ivar]
+    lazy = lazymap[var]
+
+    if isa(lazy, RangeVar)
+      space[ivar] = [lazy.minval : discmap[statevar].step : lazy.maxval]
+    elseif isa(lazy, ValuesVar)
+      space[ivar] = lazy.values
+    else
+      error(string("unknown state/action variable definition type for ", statevar))
+    end
+  end
+  return space
 end
 
 function solve(mdp::MDP, svi::SerialValueIteration)

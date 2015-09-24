@@ -70,6 +70,7 @@ actionvariable!(mdp, "move", ["N", "S", "E", "W", "stop"])  # discrete
 
 transition!(mdp,
   ["x", "y", "goal", "move", "x", "y", "goal"],  # note |xp| is an "x" variable
+                                                 # note (s,a,s') order
   function mytransition(
       x::Float64,
       y::Float64,
@@ -101,7 +102,8 @@ transition!(mdp,
 )
 
 reward!(mdp,
-  ["x", "y", "goal", "move"],
+  ["x", "y", "goal", "move"],  # note (s,a) order
+                               # note consistency of variables order with transition
   function myreward(
       x::Float64,
       y::Float64,
