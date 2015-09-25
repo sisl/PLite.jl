@@ -133,9 +133,9 @@ solve!(mdp, solver)
 using PLite
 
 # constants
-const MinX = 0
-const MaxX = 100
-const StepX = 2
+const MinX = 0.0
+const MaxX = 100.0
+const StepX = 2.0
 
 # mdp definition
 mdp = MDP()
@@ -147,7 +147,7 @@ actionvariable!(mdp, "move", ["E", "W", "stop"])  # discrete
 
 transition!(mdp,
   ["x", "goal", "move"],
-  function mytransition(x::Float64, goal::String, move::String)
+  function mytransition(x::Float64, goal::ASCIIString, move::ASCIIString)
     function isgoal(x::Float64)
       if x == MaxX
         return "yes"
@@ -157,18 +157,23 @@ transition!(mdp,
     end
 
     if goal == "yes"
-      return [(x, goal, 1.0)]
+      return [([x, goal], 1.0)]
     end
 
     if move == "E"
       return [
         ([x, goal], 0.2),
         ([x - 1, isgoal(x - 1)], 0.2),
-        ([x + 1, isgoal(x + 1)], 0.6)
+        ([x + 1, isgoal(x + 1)], 0.6)]
     elseif move == "W"
       return [
         ([x, goal], 0.2),
         ([x - 1, isgoal(x - 1)], 0.6),
+        ([x + 1, isgoal(x + 1)], 0.2)]
+    elseif move == "stop"
+      return [
+        ([x, goal], 0.6),
+        ([x - 1, isgoal(x - 1)], 0.2),
         ([x + 1, isgoal(x + 1)], 0.2)]
     end
   end
@@ -176,8 +181,8 @@ transition!(mdp,
 
 reward!(mdp,
   ["x", "goal", "move"],
-  function myreward(x::Float64, goal::String, move::String)
-    if (goal == "yes")
+  function myreward(x::Float64, goal::ASCIIString, move::ASCIIString)
+    if goal == "yes" && move == "stop"
       return 1
     else
       return 0

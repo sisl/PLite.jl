@@ -7,14 +7,26 @@ export
 
 const MaxIter = 1000
 const Tol = 1e-4
+const Discount = 0.99
 
-abstract type ValueIteration <: Solver
+type LazyDiscrete
+
+  varname::String
+  step::Float64
+
+  LazyDiscrete(varname::String, step::Float64) = new(varname, step)
+
+end
+
+abstract ValueIteration <: Solver
 
 type SerialValueIteration <: ValueIteration
 
+  verbose::Bool
+
   maxiter::Int64
   tol::Float64
-  verbose::Bool
+  discount::Float64
 
   statemap::Dict{String, LazyDiscrete}
   actionmap::Dict{String, LazyDiscrete}
@@ -22,13 +34,15 @@ type SerialValueIteration <: ValueIteration
   actiongrid::RectangleGrid
 
   SerialValueIteration(
+      verbose::Bool=true,
       maxiter::Int64=MaxIter,
       tol::Float64=Tol,
-      verbose::Bool=false) =
+      discount::Float64=Discount) =
     new(
+      verbose,
       maxiter,
       tol,
-      verbose,
+      discount,
       Dict{String, LazyDiscrete}(),
       Dict{String, LazyDiscrete}(),
       RectangleGrid(),
@@ -38,9 +52,11 @@ end
 
 type ParallelValueIteration <: ValueIteration
 
+  verbose::Bool
+
   maxiter::Int64
   tol::Float64
-  verbose::Bool
+  discount::Float64
 
   statemap::Dict{String, LazyDiscrete}
   actionmap::Dict{String, LazyDiscrete}
@@ -48,26 +64,19 @@ type ParallelValueIteration <: ValueIteration
   actiongrid::RectangleGrid
 
   ParallelValueIteration(
+      verbose::Bool=true,
       maxiter::Int64=MaxIter,
       tol::Float64=Tol,
-      verbose::Bool=false) =
+      discount::Float64=Discount) =
     new(
+      verbose,
       maxiter,
       tol,
-      verbose,
+      discount,
       Dict{String, LazyDiscrete}(),
       Dict{String, LazyDiscrete}(),
       RectangleGrid(),
       RectangleGrid())
-
-end
-
-type LazyDiscrete
-
-  varname::String
-  step::Float64
-
-  LazyDiscrete(varname::String, step::Float64) = new(varname, step)
 
 end
 

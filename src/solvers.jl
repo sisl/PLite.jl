@@ -1,3 +1,3 @@
-abstract type Solver
+abstract Solver
 
 include("valueiteration.jl")

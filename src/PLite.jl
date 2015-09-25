@@ -1,7 +1,5 @@
 module PLite
 
-include("solvers.jl")
-
 export
   MDP,
   statevariable!,
@@ -11,24 +9,7 @@ export
   solver!,
   solve!
 
-type MDP
-
-  statemap::Dict{String, LazyVar}
-  actionmap::Dict{String, LazyVar}
-  transition::LazyFunc
-  reward::LazyFunc
-  solution::LazySolution
-
-  MDP() = new(
-    Dict{String, LazyVar}(),
-    Dict{String, LazyVar}(),
-    LazyFunc(),
-    LazyFunc(),
-    LazySolution())
-
-end
-
-abstract type LazyVar
+abstract LazyVar
 
 type RangeVar <: LazyVar
 
@@ -61,11 +42,11 @@ type LazyFunc
   fn::Function
 
   LazyFunc() = new(true, Array(String, 0), function emptyfunc() end)
-  LazyFunc(argnames::Vector{String}, fn::Function) = new(false, argnames, fn)
+  LazyFunc(argnames::Vector{ASCIIString}, fn::Function) = new(false, argnames, fn)
 
 end
 
-abstract type Solution
+abstract Solution
 
 type EmptySolution <: Solution
 end
@@ -79,6 +60,25 @@ type LazySolution
   LazySolution(solution::Solution) = new(false, solution)
 
 end
+
+type MDP
+
+  statemap::Dict{String, LazyVar}
+  actionmap::Dict{String, LazyVar}
+  transition::LazyFunc
+  reward::LazyFunc
+  solution::LazySolution
+
+  MDP() = new(
+    Dict{String, LazyVar}(),
+    Dict{String, LazyVar}(),
+    LazyFunc(),
+    LazyFunc(),
+    LazySolution())
+
+end
+
+include("solvers.jl")
 
 function statevariable!(mdp::MDP, varname::String, minval::Float64, maxval::Float64)
   if haskey(mdp.statemap, varname)
@@ -117,7 +117,7 @@ function actionvariable!(mdp::MDP, varname::String, values::Vector)
 end
 
 # |argnames| is an ordered list of argument names for |transition|
-function transition!(mdp::MDP, argnames::Vector{String}, transition::Function)
+function transition!(mdp::MDP, argnames::Vector{ASCIIString}, transition::Function)
   if !mdp.transition.empty
     warn(string(
       "transition function already exists in MDP object, ",
@@ -127,16 +127,18 @@ function transition!(mdp::MDP, argnames::Vector{String}, transition::Function)
 end
 
 # |argnames| is an ordered list of argument names for |reward|
-function reward!(mdp::MDP, argnames::Vector{String}, reward::Function)
+function reward!(mdp::MDP, argnames::Vector{ASCIIString}, reward::Function)
   if !mdp.reward.empty
     warn(string(
       "reward function already exists in MDP object, ",
       "replacing existing function definition"))
   end
-  reward.transition = LazyFunc(argnames, reward)
+  mdp.reward = LazyFunc(argnames, reward)
 end
 
 function solve!(mdp::MDP, solver::Solver)
   lazyCheck(mdp, solver)
   lazySolve!(mdp, solver)  # replaces existing |mdp.solution|
+end
+
 end

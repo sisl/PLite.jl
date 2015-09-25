@@ -52,16 +52,17 @@ function checkArgumentOrder(mdp::MDP)
     error(string(
       "the number of reward function input arguments must be the same as ",
       "the sum of the number of state and action variables"))
-  elseif saspdim != ntransitionargs
+  elseif sadim != ntransitionargs && saspdim != ntransitionargs
     error(string(
       "the number of transition function input arguments must be the same as ",
-      "the sum of the number of state, action, and next state variables"))
+      "the sum of the number of state, action, and next state variables or ",
+      "the sum of the number of state and action variables"))
   end
 
   for iarg in 1:nrewardargs
     if mdp.reward.argnames[iarg] != mdp.transition.argnames[iarg]
       error(string(
-        "transition and reward function state and action variable input arguments"
+        "transition and reward function state and action variable input arguments",
         "must be consistent in both naming and order"))
     end
   end
@@ -70,7 +71,7 @@ function checkArgumentOrder(mdp::MDP)
     for iarg in 1:nrewardargs - actiondim
       if mdp.transition.argnames[iarg] != mdp.transition.argnames[iarg + sadim]
         error(string(
-          "transition type T(s,a,s')'s state s and next state s' variable "
+          "transition type T(s,a,s')'s state s and next state s' variable ",
           "input arguments must be consistent in both naming and order"))
       end
     end
@@ -81,17 +82,19 @@ end
 function checkTransition(mdp::MDP)
   args = randargs(mdp)
   transitionval = mdp.transition.fn(args...)
+
   if isa(transitionval, Float64) || isa(transitionval, Vector)
     checkTransition(mdp, args, transitionval)
   else
     error(string(
       "transition function provided is not a correctly defined ",
-      "T(s,a,s') or T(s,a) type function, check the return type"))
+      "T(s,a,s') or T(s,a) type function, check the return type\n",
+      "return type: ", typeof(transitionval)))
   end
 end
 
 function checkTransition(mdp::MDP, args::Vector, transitionval::Float64)
-  if transitionval < 0.0 || transitionval > 1.0
+  if transitionval < 0 || transitionval > 1
     warn(string(  # warn not error because we might have sampled a non-existent state
       "transition function provided is of type T(s,a,s'), ",
       "but the value returned from a random state is not ",
@@ -111,7 +114,7 @@ function checkTransition(mdp::MDP, args::Vector, transitionval::Vector)
     prob = returnval[2]
     sumprob += prob
 
-    if length(state) != nargs || !isvalid(mdp, state)
+    if length(state) + length(prob) != nargs || !isvalid(mdp, state)
       error(string(
         "transition function provided is of type T(s,a), ",
         "but one of the states returned from a random state is ",
@@ -120,7 +123,7 @@ function checkTransition(mdp::MDP, args::Vector, transitionval::Vector)
         "random state: ", args, "\n",
         "return value: ", state, "\n",
         "probability: ", prob))
-    elseif prob < 0.0 || prob > 1.0
+    elseif prob < 0 || prob > 1
       error(string(
         "transition function provided is of type T(s,a), ",
         "but one of the probabilities returned from a random state is ",
@@ -132,11 +135,11 @@ function checkTransition(mdp::MDP, args::Vector, transitionval::Vector)
     end
   end
 
-  if sumprob != 1.0
+  if sumprob != 1
     warn(string(  # warn not error because we might have sampled a non-existent state
       "transition function provided is of type T(s,a), ",
       "but the sum of transition probabilities returned from a random state ",
-      "does not sum to 1.0\n",
+      "does not sum to 1\n",
       "argument names: ", mdp.transition.argnames, "\n",
       "random state: ", args, "\n",
       "return value: ", returnval, "\n",
@@ -164,14 +167,14 @@ function lazySample(lazyvar::LazyVar)
   if isa(lazyvar, RangeVar)
     return lazyvar.minval + rand() * (lazyvar.maxval - lazyvar.minval)
   elseif isa(lazyvar, ValuesVar)
-    return rand(lazyvar.values)
+    return lazyvar.values[rand(1:length(lazyvar.values))]
   else
     error(string("variable", lazyvar.varname, " is not a valid subtype of LazyVar"))
   end
 end
 
 function isvalid(mdp::MDP, state::Vector)
-  for iarg in length(mdp.transition.argnames)
+  for iarg in length(mdp.statemap)
     argname = mdp.transition.argnames[iarg]
     if isa(mdp.statemap[argname], RangeVar) &&
         (state[iarg] < mdp.statemap[argname].minval ||
