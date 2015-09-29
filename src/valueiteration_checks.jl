@@ -2,6 +2,7 @@ function lazyCheck(mdp::MDP, vi::ValueIteration)
   checkDiscretize(mdp, vi)
   checkArgumentOrder(mdp)
   checkTransition(mdp)
+  info(string("mdp and value iteration solver passed basic checks"))
 end
 
 # Check that all |mdp| RangeVar variables have valid discretization schemes in |vi|
@@ -83,7 +84,7 @@ function checkTransition(mdp::MDP)
   args = randargs(mdp)
   transitionval = mdp.transition.fn(args...)
 
-  if isa(transitionval, Float64) || isa(transitionval, Vector)
+  if isa(transitionval, Real) || isa(transitionval, Vector)
     checkTransition(mdp, args, transitionval)
   else
     error(string(
@@ -93,7 +94,7 @@ function checkTransition(mdp::MDP)
   end
 end
 
-function checkTransition(mdp::MDP, args::Vector, transitionval::Float64)
+function checkTransition(mdp::MDP, args::Vector, transitionval::Real)
   if transitionval < 0 || transitionval > 1
     warn(string(  # warn not error because we might have sampled a non-existent state
       "transition function provided is of type T(s,a,s'), ",

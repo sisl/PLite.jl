@@ -80,13 +80,13 @@ end
 
 include("solvers.jl")
 
-function statevariable!(mdp::MDP, varname::String, minval::Float64, maxval::Float64)
+function statevariable!(mdp::MDP, varname::String, minval::Real, maxval::Real)
   if haskey(mdp.statemap, varname)
     warn(string(
       "state variable ", varname, " already exists in MDP object, ",
       "replacing existing variable definition"))
   end
-  mdp.statemap[varname] = RangeVar(varname, minval, maxval)
+  mdp.statemap[varname] = RangeVar(varname, float64(minval), float64(maxval))
 end
 
 function statevariable!(mdp::MDP, varname::String, values::Vector)
@@ -98,13 +98,13 @@ function statevariable!(mdp::MDP, varname::String, values::Vector)
   mdp.statemap[varname] = ValuesVar(varname, values)
 end
 
-function actionvariable!(mdp::MDP, varname::String, minval::Float64, maxval::Float64)
+function actionvariable!(mdp::MDP, varname::String, minval::Real, maxval::Real)
   if haskey(mdp.actionmap, varname)
     warn(string(
       "action variable ", varname, " already exists in MDP object, ",
       "replacing existing variable definition"))
   end
-  mdp.actionmap[varname] = RangeVar(varname, minval, maxval)
+  mdp.actionmap[varname] = RangeVar(varname, float64(minval), float64(maxval))
 end
 
 function actionvariable!(mdp::MDP, varname::String, values::Vector)

@@ -53,64 +53,73 @@ using PLite
 # constants
 const MinX = 0
 const MaxX = 100
-const StepX = 2
-
-const MinY = 0
-const MaxY = 100
-const StepY = 2
+const StepX = 20
 
 # mdp definition
 mdp = MDP()
 
 statevariable!(mdp, "x", MinX, MaxX)  # continuous
-statevariable!(mdp, "y", MinY, MaxY)  # continuous
 statevariable!(mdp, "goal", ["yes", "no"])  # discrete
 
-actionvariable!(mdp, "move", ["N", "S", "E", "W", "stop"])  # discrete
+actionvariable!(mdp, "move", ["W", "E", "stop"])  # discrete
 
 transition!(mdp,
-  ["x", "y", "goal", "move", "x", "y", "goal"],  # note |xp| is an "x" variable
-                                                 # note (s,a,s') order
+  ["x", "goal", "move", "x", "goal"],  # note |xp| is an "x" variable
+                                       # note (s,a,s') order
   function mytransition(
       x::Float64,
-      y::Float64,
       goal::String,
       move::String,
       xp::Float64,
-      yp::Float64,
       goalp::String)
 
-    if (move == "N" && xp - x == 0 && yp - y == 1) ||
-      (move == "S" && xp - x == 0 && yp - y == -1) ||
-      (move == "E" && xp - x == 1 && yp - y == 0) ||
-      (move == "W" && xp - x == -1 && yp - y == 0) ||
-      (move == "stop" && xp - x == 0 && yp - y == 0)
+    function internaltransition(x::Float64, goal::String, move::String)
+      function isgoal(x::Float64)
+        if abs(x - MaxX / 2) < StepX
+          return "yes"
+        else
+          return "no"
+        end
+      end
 
-      prob = 0.6
-    elseif abs(xp - x) <= 1 && abs(yp - y) <= 1
-      prob = 0.1
-    else
-      return 0
+      if goal == "yes"
+        return [([x, goal], 1.0)]
+      end
+
+      if move == "E"
+        return [
+          ([x, goal], 0.2),
+          ([x - StepX, isgoal(x - StepX)], 0.2),
+          ([x + StepX, isgoal(x + StepX)], 0.6)]
+      elseif move == "W"
+        return [
+          ([x, goal], 0.2),
+          ([x - StepX, isgoal(x - StepX)], 0.6),
+          ([x + StepX, isgoal(x + StepX)], 0.2)]
+      elseif move == "stop"
+        return [
+          ([x, goal], 0.6),
+          ([x - StepX, isgoal(x - StepX)], 0.2),
+          ([x + StepX, isgoal(x + StepX)], 0.2)]
+      end
     end
 
-    if xp == MaxX && yp == MaxY && goalp == "yes"
-      return prob
-    else
-      return 0
+    statepprobs = internaltransition(x, goal, move)
+    for statepprob in statepprobs
+      if xp == statepprob[1][1] && goalp == statepprob[1][2]
+        return statepprob[2]
+      end
     end
+    return 0
+
   end
 )
 
 reward!(mdp,
-  ["x", "y", "goal", "move"],  # note (s,a) order
-                               # note consistency of variables order with transition
-  function myreward(
-      x::Float64,
-      y::Float64,
-      goal::String,
-      move::String)
-
-    if (goal == "yes")
+  ["x", "goal", "move"],  # note (s,a) order
+                          # note consistency of variables order with transition
+  function myreward(x::Float64, goal::String, move::String)
+    if goal == "yes" && move == "stop"
       return 1
     else
       return 0
@@ -121,7 +130,6 @@ reward!(mdp,
 # solver options
 solver = ParallelValueIteration()
 discretize_statevariable!(solver, "x", StepX)
-discretize_statevariable!(solver, "y", StepY)
 
 # generate results
 solve!(mdp, solver)
@@ -133,23 +141,23 @@ solve!(mdp, solver)
 using PLite
 
 # constants
-const MinX = 0.0
-const MaxX = 100.0
-const StepX = 2.0
+const MinX = 0
+const MaxX = 100
+const StepX = 20
 
 # mdp definition
 mdp = MDP()
 
 statevariable!(mdp, "x", MinX, MaxX)  # continuous
-statevariable!(mdp, "goal", ["yes", "no"])  # discrete
+statevariable!(mdp, "goal", ["no", "yes"])  # discrete
 
-actionvariable!(mdp, "move", ["E", "W", "stop"])  # discrete
+actionvariable!(mdp, "move", ["W", "E", "stop"])  # discrete
 
 transition!(mdp,
   ["x", "goal", "move"],
-  function mytransition(x::Float64, goal::ASCIIString, move::ASCIIString)
+  function mytransition(x::Float64, goal::String, move::String)
     function isgoal(x::Float64)
-      if x == MaxX
+      if abs(x - MaxX / 2) < StepX
         return "yes"
       else
         return "no"
@@ -163,25 +171,25 @@ transition!(mdp,
     if move == "E"
       return [
         ([x, goal], 0.2),
-        ([x - 1, isgoal(x - 1)], 0.2),
-        ([x + 1, isgoal(x + 1)], 0.6)]
+        ([x - StepX, isgoal(x - StepX)], 0.2),
+        ([x + StepX, isgoal(x + StepX)], 0.6)]
     elseif move == "W"
       return [
         ([x, goal], 0.2),
-        ([x - 1, isgoal(x - 1)], 0.6),
-        ([x + 1, isgoal(x + 1)], 0.2)]
+        ([x - StepX, isgoal(x - StepX)], 0.6),
+        ([x + StepX, isgoal(x + StepX)], 0.2)]
     elseif move == "stop"
       return [
         ([x, goal], 0.6),
-        ([x - 1, isgoal(x - 1)], 0.2),
-        ([x + 1, isgoal(x + 1)], 0.2)]
+        ([x - StepX, isgoal(x - StepX)], 0.2),
+        ([x + StepX, isgoal(x + StepX)], 0.2)]
     end
   end
 )
 
 reward!(mdp,
   ["x", "goal", "move"],
-  function myreward(x::Float64, goal::ASCIIString, move::ASCIIString)
+  function myreward(x::Float64, goal::String, move::String)
     if goal == "yes" && move == "stop"
       return 1
     else

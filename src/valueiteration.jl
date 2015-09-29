@@ -96,22 +96,22 @@ type ValueIterationSolution <: Solution
 
 end
 
-function discretize_statevariable!(vi::ValueIteration, varname::String, step::Float64)
+function discretize_statevariable!(vi::ValueIteration, varname::String, step::Real)
   if haskey(vi.statemap, varname)
     warn(string(
       "state variable ", varname, " already discretized in ValueIteration object, ",
       "replacing existing discretization scheme"))
   end
-  vi.statemap[varname] = LazyDiscrete(varname, step)
+  vi.statemap[varname] = LazyDiscrete(varname, float64(step))
 end
 
-function discretize_actionvariable!(vi::ValueIteration, varname::String, step::Float64)
+function discretize_actionvariable!(vi::ValueIteration, varname::String, step::Real)
   if haskey(vi.actionmap, varname)
     warn(string(
       "action variable ", varname, " already discretized in ValueIteration object, ",
       "replacing existing discretization scheme"))
   end
-  vi.actionmap[varname] = LazyDiscrete(varname, step)
+  vi.actionmap[varname] = LazyDiscrete(varname, float64(step))
 end
 
 include("valueiteration_checks.jl")

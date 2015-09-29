@@ -78,12 +78,12 @@ function solveset!(mdp::MDP, svi::SerialValueIteration)
   for iter in 1:svi.maxiter
 
     tic()
-    resid = 0.0
+    resid = -Inf
 
     for istate = 1:nstates
 
       state = getvar(svi.stategrid, mdp.statemap, stateargs, istate)
-      qhi = 0.0
+      qhi = -Inf
 
       for iaction = 1:nactions
 
@@ -101,7 +101,7 @@ function solveset!(mdp::MDP, svi::SerialValueIteration)
 
         qval[iaction, istate] = qnow
 
-        if iaction == 1 || qnow > qhi
+        if qnow > qhi
           qhi = qnow
           vnew[istate] = qhi
         end
@@ -111,8 +111,6 @@ function solveset!(mdp::MDP, svi::SerialValueIteration)
       # use infinity-norm
       newresid = (vold[istate] - vnew[istate])^2
       newresid > resid ? (resid = newresid) : (nothing)
-
-      vold[istate] = vnew[istate]
 
     end
 
@@ -125,6 +123,10 @@ function solveset!(mdp::MDP, svi::SerialValueIteration)
       nothing
 
     resid < svi.tol ? break : nothing
+
+    vtmp = vold
+    vold = vnew
+    vnew = vtmp
 
   end
 
@@ -154,15 +156,17 @@ function solveprob!(mdp::MDP, svi::SerialValueIteration)
 
   iter = 0
   itertime = 0.0
-  totaltime = 0.0
+  cputime = 0.0
 
   for iter in 1:svi.maxiter
 
     tic()
+    resid = -Inf
+
     for istate = 1:nstates
 
       state = getvar(svi.stategrid, mdp.statemap, stateargs, istate)
-      qhi = 0.0
+      qhi = -Inf
 
       for iaction = 1:nactions
 
@@ -180,7 +184,7 @@ function solveprob!(mdp::MDP, svi::SerialValueIteration)
 
         qval[iaction, istate] = qnow
 
-        if iaction == 1 || qnow > qhi
+        if qnow > qhi
           qhi = qnow
           vnew[istate] = qhi
         end
@@ -191,8 +195,6 @@ function solveprob!(mdp::MDP, svi::SerialValueIteration)
       newresid = (vold[istate] - vnew[istate])^2
       newresid > resid ? (resid = newresid) : (nothing)
 
-      vold[istate] = vnew[istate]
-
     end
 
     itertime = toq()
@@ -201,6 +203,10 @@ function solveprob!(mdp::MDP, svi::SerialValueIteration)
       (println("iter $iter, resid: $resid, itertime: $itertime, cputime: $cputime")) : nothing
 
     resid < svi.tol ? break : nothing
+
+    vtmp = vold
+    vold = vnew
+    vnew = vtmp
 
   end
 
@@ -302,6 +308,6 @@ function reward(mdp::MDP, state::Vector, action::Vector)
   mdp.reward.fn(state..., action...)
 end
 
-function solve!(mdp::MDP, pvi::ParallelValueIteration)
+function internalsolve!(mdp::MDP, pvi::ParallelValueIteration)
   # todo
 end
