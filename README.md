@@ -326,6 +326,8 @@ Above, `actionq` takes on the value `"E"`. This action makes sense since we're t
 
 ## Example
 
+Below are two comprehensive listings that define the simple MDP example given above, select their solvers, and extract their solutions in the form of policy functions.
+
 ### MDP with *T*(*s*, *a*, *s*') type transition
 
 ```julia
@@ -414,6 +416,7 @@ discretize_statevariable!(solver, "x", StepX)
 
 # generate results
 solve!(mdp, solver)
+policy = getpolicy(mdp)
 ```
 
 ### MDP with *T*(*s*, *a*) type transition
@@ -485,6 +488,7 @@ discretize_statevariable!(solver, "x", StepX)
 
 # generate results
 solve!(mdp, solver)
+policy = getpolicy(mdp)
 ```
 
 # Todo
