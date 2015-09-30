@@ -7,7 +7,8 @@ export
   transition!,
   reward!,
   solver!,
-  solve!
+  solve!,
+  getpolicy
 
 abstract LazyVar
 
@@ -139,6 +140,14 @@ end
 function solve!(mdp::MDP, solver::Solver)
   lazyCheck(mdp, solver)
   lazySolve!(mdp, solver)  # replaces existing |mdp.solution|
+end
+
+function getpolicy(mdp::MDP)
+  return getpolicy(mdp, mdp.solution.solution)  # for multiple dispatch
+end
+
+function getpolicy(mdp::MDP, solution::EmptySolution)
+  warn(string("no solution generated for this MDP; no policy to return"))
 end
 
 end

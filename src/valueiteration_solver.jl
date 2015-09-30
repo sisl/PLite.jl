@@ -136,9 +136,17 @@ function solveset!(mdp::MDP, svi::SerialValueIteration)
 
   mdp.solution = LazySolution(ValueIterationSolution(
     qval,
+    svi.stategrid,
+    svi.actiongrid,
     cputime,
     iter,
     resid))
+
+  info(string(
+    "value iteration solution generated\n",
+    "cputime [s] = ", cputime, "\n",
+    "number of iterations = ", iter, "\n",
+    "residual = ", resid))
 end
 
 function solveprob!(mdp::MDP, svi::SerialValueIteration)
@@ -210,11 +218,23 @@ function solveprob!(mdp::MDP, svi::SerialValueIteration)
 
   end
 
+  if iter == svi.maxiter
+    warn(string("maximum number of iterations reached; check accuracy of solutions"))
+  end
+
   mdp.solution = LazySolution(ValueIterationSolution(
     qval,
+    svi.stategrid,
+    svi.actiongrid,
     cputime,
     iter,
     resid))
+
+  info(string(
+    "value iteration solution generated\n",
+    "cputime [s] = ", cputime, "\n",
+    "number of iterations = ", iter, "\n",
+    "residual = ", resid))
 end
 
 # Returns the actual variable from GridInterpolations indices
