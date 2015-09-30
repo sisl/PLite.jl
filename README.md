@@ -1,6 +1,6 @@
 # PLite.jl
 
-PLite is a Julia-based modeling system for Markov decision processes. PLite turns Julia into a modeling language, allowing the stochastic problem to be specified using standard Julia expression syntax.
+PLite, pronounced "polite,"<sup>[1](#footenote1)</sup> is a Julia-based modeling system for Markov decision processes. PLite turns Julia into a modeling language, allowing the stochastic problem to be specified using standard Julia expression syntax.
 
 ## Problem definition
 
@@ -487,8 +487,14 @@ discretize_statevariable!(solver, "x", StepX)
 solve!(mdp, solver)
 ```
 
-## Todo
+# Todo
+
+## Short-term
 
 * [ ] add support for parallel value iteration
 * [ ] add support for pomdps (qmdp and fib)
+
+## Medium-term
 * [ ] link with pomdps.jl
+
+<a name="footnote1">1</a>: because that's what Hao Yi, the author, aspires to be
