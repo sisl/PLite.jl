@@ -495,7 +495,6 @@ policy = getpolicy(mdp)
 
 ## Short-term
 
-* [ ] add support for parallel value iteration
 * [ ] add support for pomdps (qmdp and fib)
 
 ## Medium-term
