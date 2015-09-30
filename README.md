@@ -489,6 +489,6 @@ solve!(mdp, solver)
 
 ## Todo
 
-* [ ] add tools to get policy object from mdp solution
+* [ ] add support for parallel value iteration
 * [ ] add support for pomdps (qmdp and fib)
 * [ ] link with pomdps.jl
