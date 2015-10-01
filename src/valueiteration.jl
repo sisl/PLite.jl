@@ -2,14 +2,9 @@ using
   GridInterpolations
 
 export
-  # public
   SerialValueIteration,
   ParallelValueIteration,
-  discretize_statevariable!,
-  # private
-  lazyCheck,
-  lazySolve!,
-  getpolicy
+  discretize_statevariable!
 
 const MaxIter = 1000
 const Tol = 1e-4
@@ -131,34 +126,34 @@ end
 
 function getpolicy(mdp::MDP, solution::ValueIterationSolution)
 
-  function policy(state...)
+  statedim = length(mdp.statemap)
+  actiondim = length(mdp.actionmap)
+  stateargs = mdp.reward.argnames[1:statedim]
+  actionargs = mdp.reward.argnames[1 + statedim:end]
+  nactions, nstates = size(solution.qval)
 
-    statedim = length(mdp.statemap)
-    actiondim = length(mdp.actionmap)
-    stateargs = mdp.reward.argnames[1:statedim]
-    actionargs = mdp.reward.argnames[1 + statedim:end]
-
-    function indexify(statevec::Vector)
-      stateidxvec = zeros(statedim)
-      for idim in 1:statedim
-        statevar = mdp.statemap[stateargs[idim]]
-        if isa(statevar, RangeVar)
-          stateidxvec[idim] = statevec[idim]
-        elseif isa(statevar, ValuesVar)
-          stateidxvec[idim] = findfirst(statevar.values, statevec[idim])
-        else
-          error(string(
-            "unknown state variable definition type for ", statevar))
-        end
+  function indexify(statevec::Vector)
+    stateidxvec = zeros(statedim)
+    for idim in 1:statedim
+      statevar = mdp.statemap[stateargs[idim]]
+      if isa(statevar, RangeVar)
+        stateidxvec[idim] = statevec[idim]
+      elseif isa(statevar, ValuesVar)
+        stateidxvec[idim] = findfirst(statevar.values, statevec[idim])
+      else
+        error(string(
+          "unknown state variable definition type for ", statevar))
       end
-      return stateidxvec
     end
+    return stateidxvec
+  end
+
+  function policy(state...)
 
     statevec = [stateelem for stateelem in state]
     stateidxvec = indexify(statevec)
     stateidxs, wts = interpolants(solution.stategrid, stateidxvec)
 
-    nactions, nstates = size(solution.qval)
     iaction_best = 0
     vaction_best = -Inf
 

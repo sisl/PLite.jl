@@ -4,8 +4,7 @@ export
   actionvariable!,
   transition!,
   reward!,
-  solver!,
-  solve!,
+  solve,
   getpolicy
 
 abstract LazyVar
@@ -45,39 +44,23 @@ type LazyFunc
 
 end
 
-abstract Solution
-
-type EmptySolution <: Solution
-end
-
-type LazySolution
-
-  empty::Bool
-  solution::Solution
-
-  LazySolution() = new(true, EmptySolution())
-  LazySolution(solution::Solution) = new(false, solution)
-
-end
-
 type MDP
 
   statemap::Dict{String, LazyVar}
   actionmap::Dict{String, LazyVar}
   transition::LazyFunc
   reward::LazyFunc
-  solution::LazySolution
 
   MDP() = new(
     Dict{String, LazyVar}(),
     Dict{String, LazyVar}(),
     LazyFunc(),
-    LazyFunc(),
-    LazySolution())
+    LazyFunc())
 
 end
 
 abstract Solver
+abstract Solution
 
 function statevariable!(mdp::MDP, varname::String, minval::Real, maxval::Real)
   if haskey(mdp.statemap, varname)
@@ -135,15 +118,7 @@ function reward!(mdp::MDP, argnames::Vector{ASCIIString}, reward::Function)
   mdp.reward = LazyFunc(argnames, reward)
 end
 
-function solve!(mdp::MDP, solver::Solver)
+function solve(mdp::MDP, solver::Solver)
   lazyCheck(mdp, solver)
-  lazySolve!(mdp, solver)  # replaces existing |mdp.solution|
-end
-
-function getpolicy(mdp::MDP)
-  return getpolicy(mdp, mdp.solution.solution)  # for multiple dispatch
-end
-
-function getpolicy(mdp::MDP, solution::EmptySolution)
-  warn(string("no solution generated for this MDP; no policy to return"))
+  return lazySolve(mdp, solver)
 end

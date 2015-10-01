@@ -1,4 +1,4 @@
-function internalsolve!(mdp::MDP, pvi::ParallelValueIteration)
+function internalsolve(mdp::MDP, pvi::ParallelValueIteration)
 
   solvechunk! = function emptyfunc() end
   if length(mdp.transition.argnames) == length(mdp.statemap) + length(mdp.actionmap)
@@ -91,19 +91,19 @@ function internalsolve!(mdp::MDP, pvi::ParallelValueIteration)
       "maximum number of iterations reached; check accuracy of solutions"))
   end
 
-  mdp.solution = LazySolution(ValueIterationSolution(
-    shmat2mat(qval),
-    pvi.stategrid,
-    pvi.actiongrid,
-    cputime,
-    iter,
-    resid))
-
   info(string(
     "value iteration solution generated\n",
     "cputime [s] = ", cputime, "\n",
     "number of iterations = ", iter, "\n",
     "residual = ", resid))
+
+  return ValueIterationSolution(
+    shmat2mat(qval),
+    pvi.stategrid,
+    pvi.actiongrid,
+    cputime,
+    iter,
+    resid)
 
 end
 
@@ -220,30 +220,4 @@ function updatechunk!(
     vold[i] = vnew[i]
   end
   return idxs
-end
-
-# Returns the actual variable from GridInterpolations indices
-function getvar(
-    grid::RectangleGrid,
-    map::Dict{String, LazyVar},
-    argnames::Vector{String},
-    index::Int64)
-
-  raw = ind2x(grid, index)
-  var = Array(Any, length(raw))
-
-  for ivar in 1:length(raw)
-    lazy = map[argnames[ivar]]
-    if isa(lazy, RangeVar)
-      var[ivar] = raw[ivar]
-    elseif isa(lazy, ValuesVar)
-      var[ivar] = lazy.values[raw[ivar]]
-    else
-      error(string(
-        "unknown state/action variable definition type for ", argnames[ivar]))
-    end
-  end
-
-  return var
-
 end

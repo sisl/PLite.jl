@@ -1,8 +1,8 @@
-function lazySolve!(mdp::MDP, vi::ValueIteration)
+function lazySolve(mdp::MDP, vi::ValueIteration)
   statespace, actionspace = getspaces(mdp, vi)
   vi.stategrid = RectangleGrid(statespace...)
   vi.actiongrid = RectangleGrid(actionspace...)
-  internalsolve!(mdp, vi)
+  return internalsolve(mdp, vi)
 end
 
 function getspaces(mdp::MDP, vi::ValueIteration)
@@ -40,6 +40,32 @@ function getspace(
   end
 
   return space
+
+end
+
+# Returns the actual variable from GridInterpolations indices
+function getvar(
+    grid::RectangleGrid,
+    map::Dict{String, LazyVar},
+    argnames::Vector{String},
+    index::Int64)
+
+  raw = ind2x(grid, index)
+  var = Array(Any, length(raw))
+
+  for ivar in 1:length(raw)
+    lazy = map[argnames[ivar]]
+    if isa(lazy, RangeVar)
+      var[ivar] = raw[ivar]
+    elseif isa(lazy, ValuesVar)
+      var[ivar] = lazy.values[raw[ivar]]
+    else
+      error(string(
+        "unknown state/action variable definition type for ", argnames[ivar]))
+    end
+  end
+
+  return var
 
 end
 

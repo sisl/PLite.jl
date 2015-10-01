@@ -1,3 +1,3 @@
-function lazySolve!()
+function lazySolve()
   # todo
 end

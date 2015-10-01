@@ -1,8 +1,8 @@
-function internalsolve!(mdp::MDP, svi::SerialValueIteration)
+function internalsolve(mdp::MDP, svi::SerialValueIteration)
   if length(mdp.transition.argnames) == length(mdp.statemap) + length(mdp.actionmap)
-    solveset!(mdp, svi)
+    return solveset(mdp, svi)
   elseif length(mdp.transition.argnames) > length(mdp.statemap) + length(mdp.actionmap)
-    solveprob!(mdp, svi)
+    return solveprob(mdp, svi)
   else
     error(string(
       "unkown transition function of neither T(s,a,s') nor T(s,a) type\n",
@@ -13,7 +13,7 @@ function internalsolve!(mdp::MDP, svi::SerialValueIteration)
   end
 end
 
-function solveset!(mdp::MDP, svi::SerialValueIteration)
+function solveset(mdp::MDP, svi::SerialValueIteration)
 
   statedim = length(mdp.statemap)
   stateargs = mdp.reward.argnames[1:statedim]
@@ -91,23 +91,23 @@ function solveset!(mdp::MDP, svi::SerialValueIteration)
       "maximum number of iterations reached; check accuracy of solutions"))
   end
 
-  mdp.solution = LazySolution(ValueIterationSolution(
-    qval,
-    svi.stategrid,
-    svi.actiongrid,
-    cputime,
-    iter,
-    resid))
-
   info(string(
     "value iteration solution generated\n",
     "cputime [s] = ", cputime, "\n",
     "number of iterations = ", iter, "\n",
     "residual = ", resid))
 
+  return ValueIterationSolution(
+    qval,
+    svi.stategrid,
+    svi.actiongrid,
+    cputime,
+    iter,
+    resid)
+
 end
 
-function solveprob!(mdp::MDP, svi::SerialValueIteration)
+function solveprob(mdp::MDP, svi::SerialValueIteration)
 
   statedim = length(mdp.statemap)
   stateargs = mdp.reward.argnames[1:statedim]
@@ -185,18 +185,18 @@ function solveprob!(mdp::MDP, svi::SerialValueIteration)
       "maximum number of iterations reached; check accuracy of solutions"))
   end
 
-  mdp.solution = LazySolution(ValueIterationSolution(
-    qval,
-    svi.stategrid,
-    svi.actiongrid,
-    cputime,
-    iter,
-    resid))
-
   info(string(
     "value iteration solution generated\n",
     "cputime [s] = ", cputime, "\n",
     "number of iterations = ", iter, "\n",
     "residual = ", resid))
+
+  return ValueIterationSolution(
+    qval,
+    svi.stategrid,
+    svi.actiongrid,
+    cputime,
+    iter,
+    resid)
 
 end
