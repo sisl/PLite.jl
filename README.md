@@ -1,6 +1,6 @@
 # PLite.jl
 
-PLite, pronounced "polite,"<sup>[1](#myfootnote1)</sup> is a Julia-based modeling system for Markov decision processes. PLite turns Julia into a modeling language, allowing the stochastic problem to be specified using standard Julia expression syntax.
+PLite, pronounced "polite,"<sup>[1](#myfootnote1)</sup> is a Julia-based modeling system for Markov decision processes. PLite turns Julia into a modeling language, allowing the stochastic problem to be specified using simple Julia expression syntax.
 
 ## Problem definition
 
@@ -588,7 +588,7 @@ If we want to query the optimal policy to take at the state `stateq = (12, "no")
 actionq = policy(stateq...)
 ```
 
-Above, `actionq` takes on the value `"E"`. This action makes sense since we're to the west of the midpoint goal for the problem, and moving east would bring us closer to the goal. Note that we used the trailing  `...` to expand `stateq`. An equally valid function call is
+Above, `actionq` takes on the value `"E"`. This action makes sense since we're to the west of the midpoint goal for the problem, and moving east would bring us closer to the goal. Note that we used the trailing ellipsis `...` to expand `stateq`. An equally valid (and probably faster) function call is
 
 ```julia
 actionq = policy(12, "no")
