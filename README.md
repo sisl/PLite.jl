@@ -598,6 +598,7 @@ actionq = policy(12, "no")
 
 ## Short-term
 
+* [ ] add MCTS
 * [ ] add support for pomdps (qmdp and fib)
 
 ## Medium-term
@@ -614,7 +615,7 @@ If we want to run a program in parallel, we need our code to be available on all
 When you input code to, say, the Julia console or Jupyter notebook, it's only available to the main process, whichever one executes the code. This is true even if we called `addprocs` before the code is input. One way to load the code to all processes is to use the `using` keyword on a module. We adopt this approach.
 
 <a name="myfootnote3">3</a>:
-At the very least, what the author thinks the simplest way to use parallel value iteration. File an issue on Github if you can think of a better way to do this without exposing the user to complicated stuff under the hood. (>_<)"
+At the very least, what the author thinks the simplest way to use parallel value iteration. File an issue on Github if you can think of a better way to do this without exposing the user to complicated stuff under the hood. :persevere:
 
 <a name="myfootnote4">4</a>:
 Although the objects and functions exported by `ExampleModule` is only available to the main process that runs on the console or Jupyter notebook.
