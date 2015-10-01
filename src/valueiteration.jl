@@ -1,9 +1,15 @@
-using GridInterpolations
+using
+  GridInterpolations
 
 export
+  # public
   SerialValueIteration,
   ParallelValueIteration,
-  discretize_statevariable!
+  discretize_statevariable!,
+  # private
+  lazyCheck,
+  lazySolve!,
+  getpolicy
 
 const MaxIter = 1000
 const Tol = 1e-4

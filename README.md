@@ -96,11 +96,11 @@ An example of a *T*(*s*, *a*, *s*') type transition function is as follows. Here
 
 ```julia
 function mytransition(
-      x::Float64,
-      goal::String,
-      move::String,
-      xp::Float64,
-      goalp::String)
+    x::Float64,
+    goal::String,
+    move::String,
+    xp::Float64,
+    goalp::String)
 ```
 
 the array of (ordered) argument names is `["x", "goal", "move", "x", "goal"]` rather than `["x", "goal", "move", "xp", "goalp"]`. Below is the full listing that defines the transition for `mdp`.
