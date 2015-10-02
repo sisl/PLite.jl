@@ -1,3 +1,32 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [PLite.jl](#plitejl)
+  - [Problem definition](#problem-definition)
+    - [MDP](#mdp)
+      - [State space](#state-space)
+      - [Action space](#action-space)
+      - [Transition](#transition)
+        - [*T*(*s*, *a*, *s*') type transition](#ts-a-s-type-transition)
+        - [*T*(*s*, *a*) type transition](#ts-a-type-transition)
+      - [Reward](#reward)
+  - [Solver selection](#solver-selection)
+    - [Serial Value iteration](#serial-value-iteration)
+      - [Infinite horizon with discount](#infinite-horizon-with-discount)
+      - [Finite horizon without discount](#finite-horizon-without-discount)
+      - [Example](#example)
+        - [MDP with *T*(*s*, *a*, *s*') type transition](#mdp-with-ts-a-s-type-transition)
+        - [MDP with *T*(*s*, *a*) type transition](#mdp-with-ts-a-type-transition)
+    - [Parallel Value Iteration](#parallel-value-iteration)
+    - [Solution](#solution)
+- [Todos](#todos)
+  - [Short-term](#short-term)
+  - [Medium-term](#medium-term)
+- [Footnotes](#footnotes)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # PLite.jl
 
 PLite, pronounced "polite,"<sup>[1](#myfootnote1)</sup> is a Julia-based modeling system for Markov decision processes. PLite turns Julia into a modeling language, allowing the stochastic problem to be specified using simple Julia expression syntax.
