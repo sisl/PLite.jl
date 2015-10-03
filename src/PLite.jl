@@ -1,6 +1,7 @@
 module PLite
 
-include("common.jl")
+include("common_defs.jl")
+include("common_checks.jl")
 include("solvers.jl")
 
 end
