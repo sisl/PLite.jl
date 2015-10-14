@@ -12,7 +12,8 @@ In Depth Documentation
 .. toctree::
   :maxdepth: 2
 
-  Installation <install>
+  Installation <installation>
   Problem definition <definition>
-  Solver selection <solver>
+  Solver selection <solvers>
   Solution <solution>
+  Example <examples>
