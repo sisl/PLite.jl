@@ -177,7 +177,7 @@ function getpolicy(mdp::MDP, solution::ValueIterationSolution)
       if isa(actionvar, RangeVar)
         action[i] = rawaction[i]
       elseif isa(actionvar, ValuesVar)
-        action[i] = actionvar.values[rawaction[i]]
+        action[i] = actionvar.values[Int64(rawaction[i])]
       else
         error(string(
           "unknown action variable definition type for ", actionvar))
