@@ -7,12 +7,12 @@ MDP
 
 In a Markov decision process (MDP), an agent chooses action *a* based on observing state *s*. The agent then receives a reward *r*. The state evolves stochastically based on the current state and action taken by the agent. Note that the next state depends only on the current state and action, and not on any prior state or action. This assumption is known as the Markov assumption.
 
-An MDP is typically defined by the tuple (*S*, *A*, *T*, *R*), where
+An MDP is typically defined by the tuple *(S, A, T, R)*, where
 
 * *S* is the state space
 * *A* is the action space
-* *T*(*s*, *a*, *s*') is the transition function that gives the probability of reaching state *s*' from state s by taking action *a*
-* *R*(*s*, *a*) is the reward function that gives a scalar value for taking action *a* at state *s*.
+* *T(s, a, s')* is the transition function that gives the probability of reaching state *s*' from state s by taking action *a*
+* *R(s, a)* is the reward function that gives a scalar value for taking action *a* at state *s*.
 
 To define an MDP, simply type the following.
 
@@ -66,16 +66,16 @@ To define a continuous and a discrete action variable *bankangle* and *move*, re
 
 ::
 
-actionvariable!(mdp, "bankangle", -180, 180)
-actionvariable!(mdp, "move", ["up", "down", "left", "right"])
+  actionvariable!(mdp, "bankangle", -180, 180)
+  actionvariable!(mdp, "move", ["up", "down", "left", "right"])
 
 Transition
 ==========
 
 PLite provides two ways to define a transition model. Depending on the problem, it may be easier to define the transition model one way or another.
 
-*T*(*s*, *a*, *s*') type transition
------------------------------------
+*T(s, a, s')* type transition
+-----------------------------
 
 The first method follows the standard definition that returns a probability value between 0 and 1. Suppose we have the following definition of an MDP.
 
@@ -93,9 +93,9 @@ The first method follows the standard definition that returns a probability valu
 
   actionvariable!(mdp, "move", ["W", "E", "stop"])  # discrete
 
-We want to define a transition function that takes a state-action-next state triplet (*s*, *a*, *s*') and returns the probability of starting in state *s*, taking action *a*, and ending up in state *s*'. Internally, PLite needs to match the defined state and action variables with the corresponding arguments for the transition function. To do this, we need to pass in an array of the argument names in the order they are to be input to the defined transition function.
+We want to define a transition function that takes a state-action-next state triplet *(s, a, s')* and returns the probability of starting in state *s*, taking action *a*, and ending up in state *s*'. Internally, PLite needs to match the defined state and action variables with the corresponding arguments for the transition function. To do this, we need to pass in an array of the argument names in the order they are to be input to the defined transition function.
 
-An example of a *T*(*s*, *a*, *s*') type transition function is as follows. Here, the state variables are named ``"x"`` and ``"goal"``, and the action variable is named ``"move"``. Note that although *s*' is a different variable from *s*, they share the variable names ``"x"`` and ``"goal"``. So even though the ``mytransition`` function signature is
+An example of a *T(s, a, s')* type transition function is as follows. Here, the state variables are named ``"x"`` and ``"goal"``, and the action variable is named ``"move"``. Note that although *s*' is a different variable from *s*, they share the variable names ``"x"`` and ``"goal"``. So even though the ``mytransition`` function signature is
 
 ::
 
@@ -179,10 +179,10 @@ the array of (ordered) argument names is ``["x", "goal", "move", "x", "goal"]`` 
     end
   )
 
-*T*(*s*, *a*) type transition
------------------------------
+*T(s, a)* type transition
+-------------------------
 
-The second way to define a transition model is to take in a state-action pair and return the set of all possible next states with their corresponding probabilities. Again, we need to pass an array of argument names in the order the (*s*, *a*) pair is defined to the transition function. Below is the full listing that defines the transition this way. It is mathematically equivalent to the *T*(*s*, *a*, *s*') type transition defined above.
+The second way to define a transition model is to take in a state-action pair and return the set of all possible next states with their corresponding probabilities. Again, we need to pass an array of argument names in the order the *(s, a)* pair is defined to the transition function. Below is the full listing that defines the transition this way. It is mathematically equivalent to the *T(s, a, s')* type transition defined above.
 
 ::
 
@@ -240,9 +240,9 @@ The second way to define a transition model is to take in a state-action pair an
 Reward
 ======
 
-The reward function takes in a state-action pair (*s*, *a*) and returns a scalar value indicating the expected reward received when executing action *a* from state *s*. We assume that the reward function is a deterministic function of *s* and *a*.
+The reward function takes in a state-action pair *(s, a)* and returns a scalar value indicating the expected reward received when executing action *a* from state *s*. We assume that the reward function is a deterministic function of *s* and *a*.
 
-The process of defining the reward function is similar to that for the *T*(*s*, *a*) type transition function. We need to pass in an ordered array of variable names for PLite's internal housekeeping.
+The process of defining the reward function is similar to that for the *T(s, a)* type transition function. We need to pass in an ordered array of variable names for PLite's internal housekeeping.
 
 ::
 

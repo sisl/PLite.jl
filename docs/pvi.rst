@@ -4,7 +4,7 @@ Parallel Value Iteration
 
 To reap the benefits of Julia's parallel computing framework for value iteration, we need a few more steps. The main issue we have to get around is code availability when we add processes. But we'll skip an in-depth explanation and just go straight to what we can do.
 
-We consider a quick and dirty example of running the exact same code as in the MDP with *T*(*s*, *a*) type transition on PLite's parallel value iteration solver. First, we wrap our existing code under the module ``ExampleModule`` (you can name it whatever you want), and save it under the file name ``ExampleModule.jl``. As our naming scheme suggests, the module and file should share the same name. Below is what should be saved to the file.
+We consider a quick and dirty example of running the exact same code as in the MDP with *T(s, a)* type transition on PLite's parallel value iteration solver. First, we wrap our existing code under the module ``ExampleModule`` (you can name it whatever you want), and save it under the file name ``ExampleModule.jl``. As our naming scheme suggests, the module and file should share the same name. Below is what should be saved to the file.
 
 ::
 

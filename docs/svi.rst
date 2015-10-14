@@ -20,7 +20,7 @@ In PLite, value iteration requires all variables to be discretized. In the above
   const StepX = 20
   discretize_statevariable!(solver, "x", StepX)
 
-Note that the solver uses the ``GridInterpolations.jl`` package for multilinear interpolation to approximate the values between the discretized state variable values if the *T*(*s*, *a*) type transition is defined. In the *T*(*s*, *a*, *s*') type transition, PLite assumes that for any (*s*, *a*, *s*') triplet the transition function will return a valid probability. In this case, the user is assumed to have defined a consistent MDP problem and no approximation is done on the part of PLite.
+Note that the solver uses the ``GridInterpolations.jl`` package for multilinear interpolation to approximate the values between the discretized state variable values if the *T(s, a)* type transition is defined. In the *T(s, a, s')* type transition, PLite assumes that for any *(s, a, s')* triplet the transition function will return a valid probability. In this case, the user is assumed to have defined a consistent MDP problem and no approximation is done on the part of PLite.
 
 In any case, to solve the problem, simply pass both ``mdp`` and ``solver`` to the ``solve`` function.
 
@@ -65,7 +65,7 @@ Example
 
 Below are two comprehensive listings that define the simple MDP example given above, select their solvers, and extract their solutions in the form of policy functions.
 
-  * MDP with *T*(*s*, *a*, *s*') type transition
+  * MDP with *T(s, a, s')* type transition
 
 ::
 
@@ -172,7 +172,7 @@ Below are two comprehensive listings that define the simple MDP example given ab
   # generate results
   solution = solve(mdp, solver)
 
-  * MDP with *T*(*s*, *a*) type transition
+  * MDP with *T(s, a)* type transition
 
 ::
 

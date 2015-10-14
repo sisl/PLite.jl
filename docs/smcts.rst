@@ -2,7 +2,7 @@
 Monte-Carlo Tree Search
 =======================
 
-The Monte-Carlo tree search (MCTS) algorithm relies on the same problem definition framework as the value iteration algorithms. Like value iteration, MCTS works by keeping an internal approximation of *Q*(*s*,*a*)* values and chooses the action that maximizes this state-action utility. Unlike value iteration, however, MCTS is an online algorithm. This means that the MCTS policy may start off poor, but it gets better the more it interacts with the MDP simulator/environment.
+The Monte-Carlo tree search (MCTS) algorithm relies on the same problem definition framework as the value iteration algorithms. Like value iteration, MCTS works by keeping an internal approximation of the *Q(s, a)* state-action utility and chooses the action that maximizes this state-action utility. Unlike value iteration, however, MCTS is an online algorithm. This means that the MCTS policy may start off poor, but it gets better the more it interacts with the MDP simulator/environment.
 
 Note that a key assumption is that both the action space and the state space are finite. Otherwise, we will keep selecting unexplored actions, and no node of depth higher than one would be added. Thus, after the state and action spaces are discretized, the algorithm only works with these discrete states and actions. For the transition function in our implementation, we will map the given current state and action pair to the closest discrete state and action. Additionally, the next state transitioned into (via sampling) will also be mapped to the closest discrete state.
 
