@@ -20,9 +20,9 @@ end
 
 function getspace(
     dim::Int64,
-    args::Vector{String},
-    lazymap::Dict{String, LazyVar},
-    discmap::Dict{String, LazyDiscrete})
+    args::Vector{ASCIIString},
+    lazymap::Dict{AbstractString, LazyVar},
+    discmap::Dict{AbstractString, LazyDiscrete})
 
   space = Array(Vector{Float64}, dim)
   for ivar in 1:length(args)
@@ -30,9 +30,9 @@ function getspace(
     lazy = lazymap[var]
 
     if isa(lazy, RangeVar)
-      space[ivar] = [lazy.minval : discmap[var].step : lazy.maxval]
+      space[ivar] = collect(lazy.minval : discmap[var].step : lazy.maxval)
     elseif isa(lazy, ValuesVar)
-      space[ivar] = float64([1:length(lazy.values)])  # map to indices
+      space[ivar] = map(Float64, collect(1:length(lazy.values)))  # map to indices
     else
       error(string(
         "unknown state/action variable definition type for ", var))

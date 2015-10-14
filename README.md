@@ -19,7 +19,8 @@
         - [MDP with *T*(*s*, *a*, *s*') type transition](#mdp-with-ts-a-s-type-transition)
         - [MDP with *T*(*s*, *a*) type transition](#mdp-with-ts-a-type-transition)
     - [Parallel Value Iteration](#parallel-value-iteration)
-    - [Solution](#solution)
+    - [Monte-Carlo Tree Search](#monte-carlo-tree-search)
+  - [Solution](#solution)
 - [Todos](#todos)
   - [Short-term](#short-term)
   - [Medium-term](#medium-term)
@@ -154,25 +155,42 @@ transition!(mdp,
         end
       end
 
-      if goal == "yes"
-        return [([x, goal], 1.0)]
+      if isgoal(x) == "yes" && goal == "yes"
+        return [([x, isgoal(x)], 1.0)]
       end
 
       if move == "E"
-        return [
-          ([x, goal], 0.2),
-          ([x - StepX, isgoal(x - StepX)], 0.2),
-          ([x + StepX, isgoal(x + StepX)], 0.6)]
+        if x >= MaxX
+          return [
+            ([x, isgoal(x)], 0.9),
+            ([x - StepX, isgoal(x - StepX)], 0.1)]
+        elseif x <= MinX
+          return [
+            ([x, isgoal(x)], 0.2),
+            ([x + StepX, isgoal(x + StepX)], 0.8)]
+        else
+          return [
+            ([x, isgoal(x)], 0.1),
+            ([x - StepX, isgoal(x - StepX)], 0.1),
+            ([x + StepX, isgoal(x + StepX)], 0.8)]
+        end
       elseif move == "W"
-        return [
-          ([x, goal], 0.2),
-          ([x - StepX, isgoal(x - StepX)], 0.6),
-          ([x + StepX, isgoal(x + StepX)], 0.2)]
+        if x >= MaxX
+          return [
+            ([x, isgoal(x)], 0.1),
+            ([x - StepX, isgoal(x - StepX)], 0.9)]
+        elseif x <= MinX
+          return [
+          ([x, isgoal(x)], 0.9),
+          ([x + StepX, isgoal(x + StepX)], 0.1)]
+        else
+          return [
+            ([x, isgoal(x)], 0.1),
+            ([x - StepX, isgoal(x - StepX)], 0.8),
+            ([x + StepX, isgoal(x + StepX)], 0.1)]
+        end
       elseif move == "stop"
-        return [
-          ([x, goal], 0.6),
-          ([x - StepX, isgoal(x - StepX)], 0.2),
-          ([x + StepX, isgoal(x + StepX)], 0.2)]
+        return [([x, isgoal(x)], 1.0)]
       end
     end
 
@@ -195,7 +213,7 @@ The second way to define a transition model is to take in a state-action pair an
 ```julia
 transition!(mdp,
   ["x", "goal", "move"],
-  function mytransition(x::Float64, goal::String, move::String)
+  function mytransition(x::Float64, goal::AbstractString, move::AbstractString)
     function isgoal(x::Float64)
       if abs(x - MaxX / 2) < StepX
         return "yes"
@@ -204,25 +222,42 @@ transition!(mdp,
       end
     end
 
-    if goal == "yes"
-      return [([x, goal], 1.0)]
+    if isgoal(x) == "yes" && goal == "yes"
+      return [([x, isgoal(x)], 1.0)]
     end
 
     if move == "E"
-      return [
-        ([x, goal], 0.2),
-        ([x - StepX, isgoal(x - StepX)], 0.2),
-        ([x + StepX, isgoal(x + StepX)], 0.6)]
+      if x >= MaxX
+        return [
+          ([x, isgoal(x)], 0.9),
+          ([x - StepX, isgoal(x - StepX)], 0.1)]
+      elseif x <= MinX
+        return [
+          ([x, isgoal(x)], 0.2),
+          ([x + StepX, isgoal(x + StepX)], 0.8)]
+      else
+        return [
+          ([x, isgoal(x)], 0.1),
+          ([x - StepX, isgoal(x - StepX)], 0.1),
+          ([x + StepX, isgoal(x + StepX)], 0.8)]
+      end
     elseif move == "W"
-      return [
-        ([x, goal], 0.2),
-        ([x - StepX, isgoal(x - StepX)], 0.6),
-        ([x + StepX, isgoal(x + StepX)], 0.2)]
+      if x >= MaxX
+        return [
+          ([x, isgoal(x)], 0.1),
+          ([x - StepX, isgoal(x - StepX)], 0.9)]
+      elseif x <= MinX
+        return [
+        ([x, isgoal(x)], 0.9),
+        ([x + StepX, isgoal(x + StepX)], 0.1)]
+      else
+        return [
+          ([x, isgoal(x)], 0.1),
+          ([x - StepX, isgoal(x - StepX)], 0.8),
+          ([x + StepX, isgoal(x + StepX)], 0.1)]
+      end
     elseif move == "stop"
-      return [
-        ([x, goal], 0.6),
-        ([x - StepX, isgoal(x - StepX)], 0.2),
-        ([x + StepX, isgoal(x + StepX)], 0.2)]
+      return [([x, isgoal(x)], 1.0)]
     end
   end
 )
@@ -352,25 +387,42 @@ transition!(mdp,
         end
       end
 
-      if goal == "yes"
-        return [([x, goal], 1.0)]
+      if isgoal(x) == "yes" && goal == "yes"
+        return [([x, isgoal(x)], 1.0)]
       end
 
       if move == "E"
-        return [
-          ([x, goal], 0.2),
-          ([x - StepX, isgoal(x - StepX)], 0.2),
-          ([x + StepX, isgoal(x + StepX)], 0.6)]
+        if x >= MaxX
+          return [
+            ([x, isgoal(x)], 0.9),
+            ([x - StepX, isgoal(x - StepX)], 0.1)]
+        elseif x <= MinX
+          return [
+            ([x, isgoal(x)], 0.2),
+            ([x + StepX, isgoal(x + StepX)], 0.8)]
+        else
+          return [
+            ([x, isgoal(x)], 0.1),
+            ([x - StepX, isgoal(x - StepX)], 0.1),
+            ([x + StepX, isgoal(x + StepX)], 0.8)]
+        end
       elseif move == "W"
-        return [
-          ([x, goal], 0.2),
-          ([x - StepX, isgoal(x - StepX)], 0.6),
-          ([x + StepX, isgoal(x + StepX)], 0.2)]
+        if x >= MaxX
+          return [
+            ([x, isgoal(x)], 0.1),
+            ([x - StepX, isgoal(x - StepX)], 0.9)]
+        elseif x <= MinX
+          return [
+          ([x, isgoal(x)], 0.9),
+          ([x + StepX, isgoal(x + StepX)], 0.1)]
+        else
+          return [
+            ([x, isgoal(x)], 0.1),
+            ([x - StepX, isgoal(x - StepX)], 0.8),
+            ([x + StepX, isgoal(x + StepX)], 0.1)]
+        end
       elseif move == "stop"
-        return [
-          ([x, goal], 0.6),
-          ([x - StepX, isgoal(x - StepX)], 0.2),
-          ([x + StepX, isgoal(x + StepX)], 0.2)]
+        return [([x, isgoal(x)], 1.0)]
       end
     end
 
@@ -425,7 +477,7 @@ actionvariable!(mdp, "move", ["W", "E", "stop"])  # discrete
 
 transition!(mdp,
   ["x", "goal", "move"],
-  function mytransition(x::Float64, goal::String, move::String)
+  function mytransition(x::Float64, goal::AbstractString, move::AbstractString)
     function isgoal(x::Float64)
       if abs(x - MaxX / 2) < StepX
         return "yes"
@@ -434,25 +486,42 @@ transition!(mdp,
       end
     end
 
-    if goal == "yes"
-      return [([x, goal], 1.0)]
+    if isgoal(x) == "yes" && goal == "yes"
+      return [([x, isgoal(x)], 1.0)]
     end
 
     if move == "E"
-      return [
-        ([x, goal], 0.2),
-        ([x - StepX, isgoal(x - StepX)], 0.2),
-        ([x + StepX, isgoal(x + StepX)], 0.6)]
+      if x >= MaxX
+        return [
+          ([x, isgoal(x)], 0.9),
+          ([x - StepX, isgoal(x - StepX)], 0.1)]
+      elseif x <= MinX
+        return [
+          ([x, isgoal(x)], 0.2),
+          ([x + StepX, isgoal(x + StepX)], 0.8)]
+      else
+        return [
+          ([x, isgoal(x)], 0.1),
+          ([x - StepX, isgoal(x - StepX)], 0.1),
+          ([x + StepX, isgoal(x + StepX)], 0.8)]
+      end
     elseif move == "W"
-      return [
-        ([x, goal], 0.2),
-        ([x - StepX, isgoal(x - StepX)], 0.6),
-        ([x + StepX, isgoal(x + StepX)], 0.2)]
+      if x >= MaxX
+        return [
+          ([x, isgoal(x)], 0.1),
+          ([x - StepX, isgoal(x - StepX)], 0.9)]
+      elseif x <= MinX
+        return [
+        ([x, isgoal(x)], 0.9),
+        ([x + StepX, isgoal(x + StepX)], 0.1)]
+      else
+        return [
+          ([x, isgoal(x)], 0.1),
+          ([x - StepX, isgoal(x - StepX)], 0.8),
+          ([x + StepX, isgoal(x + StepX)], 0.1)]
+      end
     elseif move == "stop"
-      return [
-        ([x, goal], 0.6),
-        ([x - StepX, isgoal(x - StepX)], 0.2),
-        ([x + StepX, isgoal(x + StepX)], 0.2)]
+      return [([x, isgoal(x)], 1.0)]
     end
   end
 )
@@ -508,7 +577,7 @@ actionvariable!(mdp, "move", ["W", "E", "stop"])  # discrete
 
 transition!(mdp,
   ["x", "goal", "move"],
-  function mytransition(x::Float64, goal::String, move::String)
+  function mytransition(x::Float64, goal::AbstractString, move::AbstractString)
     function isgoal(x::Float64)
       if abs(x - MaxX / 2) < StepX
         return "yes"
@@ -517,25 +586,42 @@ transition!(mdp,
       end
     end
 
-    if goal == "yes"
-      return [([x, goal], 1.0)]
+    if isgoal(x) == "yes" && goal == "yes"
+      return [([x, isgoal(x)], 1.0)]
     end
 
     if move == "E"
-      return [
-        ([x, goal], 0.2),
-        ([x - StepX, isgoal(x - StepX)], 0.2),
-        ([x + StepX, isgoal(x + StepX)], 0.6)]
+      if x >= MaxX
+        return [
+          ([x, isgoal(x)], 0.9),
+          ([x - StepX, isgoal(x - StepX)], 0.1)]
+      elseif x <= MinX
+        return [
+          ([x, isgoal(x)], 0.2),
+          ([x + StepX, isgoal(x + StepX)], 0.8)]
+      else
+        return [
+          ([x, isgoal(x)], 0.1),
+          ([x - StepX, isgoal(x - StepX)], 0.1),
+          ([x + StepX, isgoal(x + StepX)], 0.8)]
+      end
     elseif move == "W"
-      return [
-        ([x, goal], 0.2),
-        ([x - StepX, isgoal(x - StepX)], 0.6),
-        ([x + StepX, isgoal(x + StepX)], 0.2)]
+      if x >= MaxX
+        return [
+          ([x, isgoal(x)], 0.1),
+          ([x - StepX, isgoal(x - StepX)], 0.9)]
+      elseif x <= MinX
+        return [
+        ([x, isgoal(x)], 0.9),
+        ([x + StepX, isgoal(x + StepX)], 0.1)]
+      else
+        return [
+          ([x, isgoal(x)], 0.1),
+          ([x - StepX, isgoal(x - StepX)], 0.8),
+          ([x + StepX, isgoal(x + StepX)], 0.1)]
+      end
     elseif move == "stop"
-      return [
-        ([x, goal], 0.6),
-        ([x - StepX, isgoal(x - StepX)], 0.2),
-        ([x + StepX, isgoal(x + StepX)], 0.2)]
+      return [([x, isgoal(x)], 1.0)]
     end
   end
 )
@@ -600,11 +686,39 @@ solution = solve(mdp, solver)
 
 Notice we add the desired number of processes before loading the module. This sequence of code evaluation allows all processes to get the code on ExampleModule<sup>[4](#myfootnote4)</sup>. We then call `solve` on the mdp and solver to obtain the solution.
 
-### Solution
+### Monte-Carlo Tree Search
 
-The value iteration solution to the MDP generated by either the serial or parallel value iteration solver can be extracted in the form of a policy function. The policy function takes as arguments the state variables in the same order defined for the transition and reward functions.
+The Monte-Carlo tree search (MCTS) algorithm relies on the same problem definition framework as the value iteration algorithms. Like value iteration, MCTS works by keeping an internal approximation of *Q*(*s*,*a*)* values and chooses the action that maximizes this state-action utility. Unlike value iteration, however, MCTS is an online algorithm. This means that the MCTS policy may start off poor, but it gets better the more it interacts with the MDP simulator/environment.
 
-To obtain the value iteration policy from the `solution` to the `mdp` defined above, we call
+Note that a key assumption is that both the action space and the state space are finite<sup>[4](#myfootnote5)</sup>. Otherwise, we will keep selecting unexplored actions, and no node of depth higher than one would be added. Thus, after the state and action spaces are discretized, the algorithm only works with these discrete states and actions. For the transition function in our implementation, we will map the given current state and action pair to the closest discrete state and action. Additionally, the next state transitioned into (via sampling) will also be mapped to the closest discrete state.
+
+The main advantage to MCTS is its ability to give a good approximation of the state-action utility function despite not needing an expensive value iteration-type computation. We recommend using this for problems with large state and/or action spaces.
+
+The syntax for using a serial MCTS solver is similar to that of the serial value iteration solver. We still need to discretize continuous variables since our solver implements the finite MCTS. Otherwise, the only difference is having to initialize a different type of solver.
+
+```julia
+# solver options
+solver = SerialMCTS()
+discretize_statevariable!(solver, "x", StepX)
+
+# generate results
+solution = solve(mdp, solver)
+```
+
+There are four keyword arguments we can use to instantiate the solver: `niter`, `maxdepth`, `exex`, and `discount`. These parameters correspond to the number of iterations during each action selection when querying the MCTS policy object (see more in the [Solution](#solution) section), the maximum depth of the search tree used in MCTS, a constant that varies the exploration-exploitation preference, and the simulation/rollout discount factor, respectively.
+
+The default parameters are
+
+* `niter = 50`
+* `maxdepth = 20`
+* `exex = 3.0`
+* `discount = 0.99`.
+
+## Solution
+
+The solution to the MDP generated by any solver can be extracted in the form of a policy function. The policy function takes as arguments the state variables in the same order defined for the transition and reward functions.
+
+To obtain the policy from the `solution` to the `mdp` defined above, we call
 
 ```julia
 policy = getpolicy(mdp, solution)
@@ -616,7 +730,7 @@ If we want to query the optimal policy to take at the state `stateq = (12, "no")
 actionq = policy(stateq...)
 ```
 
-Above, `actionq` takes on the value `"E"`. This action makes sense since we're to the west of the midpoint goal for the problem, and moving east would bring us closer to the goal. Note that we used the trailing ellipsis `...` to expand `stateq`. An equally valid (and probably faster) function call is
+Above, `actionq` takes on the value `"E"`. This action makes sense since we're to the west of the midpoint goal for the problem, and moving east would bring us closer to the goal. Note that we used the trailing ellipsis `...` to expand `stateq`. An equally valid function call is
 
 ```julia
 actionq = policy(12, "no")
@@ -626,10 +740,11 @@ actionq = policy(12, "no")
 
 ## Short-term
 
-* [ ] add MCTS
+* [x] add serial MCTS
 * [ ] add support for pomdps (qmdp and fib)
 
 ## Medium-term
+* [ ] add parallel MCTS
 * [ ] link with pomdps.jl
 
 # Footnotes
@@ -647,3 +762,6 @@ At the very least, what the author thinks the simplest way to use parallel value
 
 <a name="myfootnote4">4</a>:
 Although the objects and functions exported by `ExampleModule` is only available to the main process that runs on the console or Jupyter notebook.
+
+<a name="myfootnote5">5</a>:
+There are ways to deal with the problem of infinite support of the probability distribution underlying the transition, and infinite action spaces, for our version of MCTS. For more information, consider Adrien Couetoux's "Monte Carlo Tree Search for Continuous and Stochastic Sequential Decision Making Problems."

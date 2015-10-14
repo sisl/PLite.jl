@@ -10,6 +10,7 @@ into (via sampling) will also be mapped to the closest discrete state.
 =#
 
 using
+  GridInterpolations,
   StatsBase
 
 export
@@ -20,22 +21,24 @@ const MaxDepth = 20
 const ExploreExploit = 3.0
 const Discount = 0.99
 
+typealias ActualState Vector
+
 type StateNode
 
   n::Vector{Int64}  # number of visits at the node for each action
   qval::Vector{Float64}  # estimated value for each action
 
   StateNode(nactions::Real) =
-    new(zeros(Int64, int64(nactions)), zeros(Float64, int64(nactions)))
+    new(zeros(Int64, Int64(nactions)), zeros(Float64, Int64(nactions)))
 
 end
 
 type LazyDiscrete
 
-  varname::String
+  varname::AbstractString
   step::Float64
 
-  LazyDiscrete(varname::String, step::Float64) = new(varname, step)
+  LazyDiscrete(varname::AbstractString, step::Float64) = new(varname, step)
 
 end
 
@@ -45,12 +48,12 @@ type SerialMCTS <: MCTS
 
   niter::Int64  # number of iterations during each action selection
   maxdepth::Int64  # max depth of search tree
-  exex::Float64  #  exploration-exploitation constant
+  exex::Float64  # exploration-exploitation constant
   discount::Float64  # simulation/rollout discount factor
 
-  tree::Dict{State, StateNode}
-  statemap::Dict{String, LazyDiscrete}
-  actionmap::Dict{String, LazyDiscrete}
+  tree::Dict{ActualState, StateNode}
+  statemap::Dict{AbstractString, LazyDiscrete}
+  actionmap::Dict{AbstractString, LazyDiscrete}
   stategrid::RectangleGrid
   actiongrid::RectangleGrid
 
@@ -60,57 +63,42 @@ type SerialMCTS <: MCTS
       exex::Real=ExploreExploit,
       discount::Real=Discount) =
     new(
-      int64(niter),
-      int64(maxdepth),
-      float64(exex),
-      float64(discount),
-      Dict{State, StateNode}(),
-      Dict{String, LazyDiscrete}(),
-      Dict{String, LazyDiscrete}(),
+      Int64(niter),
+      Int64(maxdepth),
+      Float64(exex),
+      Float64(discount),
+      Dict{ActualState, StateNode}(),
+      Dict{AbstractString, LazyDiscrete}(),
+      Dict{AbstractString, LazyDiscrete}(),
       RectangleGrid(),
       RectangleGrid())
 
 end
 
-type MCTSSolution <: Solution
-
-  tree::Dict{State, StateNode}
-  statemap::Dict{String, LazyDiscrete}
-  actionmap::Dict{String, LazyDiscrete}
-  stategrid::RectangleGrid
-  actiongrid::RectangleGrid
-
-  MCTSSolution(
-      tree::Dict{State, StateNode},
-      statemap::Dict{String, LazyDiscrete},
-      actionmap::Dict{String, LazyDiscrete},
-      stategrid::RectangleGrid,
-      actiongrid::RectangleGrid) =
-    new (tree, statemap, actionmap, stategrid, actiongrid)
-
-end
-
-function discretize_statevariable!(mcts::MCTS, varname::String, step::Real)
+function discretize_statevariable!(mcts::MCTS, varname::AbstractString, step::Real)
   if haskey(mcts.statemap, varname)
     warn(string(
       "state variable ", varname, " already discretized in ValueIteration object, ",
       "replacing existing discretization scheme"))
   end
-  mcts.statemap[varname] = LazyDiscrete(varname, float64(step))
+  mcts.statemap[varname] = LazyDiscrete(varname, Float64(step))
 end
 
-function discretize_actionvariable!(mcts::MCTS, varname::String, step::Real)
+function discretize_actionvariable!(mcts::MCTS, varname::AbstractString, step::Real)
   if haskey(mcts.actionmap, varname)
     warn(string(
       "action variable ", varname, " already discretized in ValueIteration object, ",
       "replacing existing discretization scheme"))
   end
-  mcts.actionmap[varname] = LazyDiscrete(varname, float64(step))
+  mcts.actionmap[varname] = LazyDiscrete(varname, Float64(step))
 end
 
 # returned policy is "live" and grows the search tree
-function getpolicy(mdp::MDP, solution::MCTSSolution)
-  # todo
+function getpolicy(mdp::MDP, smcts::SerialMCTS)
+  function policy(state::Vector)
+    return smctsaction!(mdp, smcts, state)
+  end
+  return policy
 end
 
 include("mcts_checks.jl")

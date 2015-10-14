@@ -11,11 +11,11 @@ abstract LazyVar
 
 type RangeVar <: LazyVar
 
-  varname::String
+  varname::AbstractString
   minval::Float64
   maxval::Float64
 
-  function RangeVar(varname::String, minval::Float64, maxval::Float64)
+  function RangeVar(varname::AbstractString, minval::Float64, maxval::Float64)
     if minval > maxval
       throw(ArgumentError("minimum value must be smaller than maximum value"))
     end
@@ -26,34 +26,34 @@ end
 
 type ValuesVar <: LazyVar
 
-  varname::String
+  varname::AbstractString
   values::Vector
 
-  ValuesVar(varname::String, values::Vector) = new(varname, values)
+  ValuesVar(varname::AbstractString, values::Vector) = new(varname, values)
 
 end
 
 type LazyFunc
 
   empty::Bool
-  argnames::Vector{String}
+  argnames::Vector{ASCIIString}
   fn::Function
 
-  LazyFunc() = new(true, Array(String, 0), function emptyfunc() end)
+  LazyFunc() = new(true, Array(AbstractString, 0), function emptyfunc() end)
   LazyFunc(argnames::Vector{ASCIIString}, fn::Function) = new(false, argnames, fn)
 
 end
 
 type MDP
 
-  statemap::Dict{String, LazyVar}
-  actionmap::Dict{String, LazyVar}
+  statemap::Dict{AbstractString, LazyVar}
+  actionmap::Dict{AbstractString, LazyVar}
   transition::LazyFunc
   reward::LazyFunc
 
   MDP() = new(
-    Dict{String, LazyVar}(),
-    Dict{String, LazyVar}(),
+    Dict{AbstractString, LazyVar}(),
+    Dict{AbstractString, LazyVar}(),
     LazyFunc(),
     LazyFunc())
 
@@ -62,16 +62,16 @@ end
 abstract Solver
 abstract Solution
 
-function statevariable!(mdp::MDP, varname::String, minval::Real, maxval::Real)
+function statevariable!(mdp::MDP, varname::AbstractString, minval::Real, maxval::Real)
   if haskey(mdp.statemap, varname)
     warn(string(
       "state variable ", varname, " already exists in MDP object, ",
       "replacing existing variable definition"))
   end
-  mdp.statemap[varname] = RangeVar(varname, float64(minval), float64(maxval))
+  mdp.statemap[varname] = RangeVar(varname, Float64(minval), Float64(maxval))
 end
 
-function statevariable!(mdp::MDP, varname::String, values::Vector)
+function statevariable!(mdp::MDP, varname::AbstractString, values::Vector)
   if haskey(mdp.statemap, varname)
     warn(string(
       "state variable ", varname, " already exists in MDP object, ",
@@ -80,16 +80,16 @@ function statevariable!(mdp::MDP, varname::String, values::Vector)
   mdp.statemap[varname] = ValuesVar(varname, values)
 end
 
-function actionvariable!(mdp::MDP, varname::String, minval::Real, maxval::Real)
+function actionvariable!(mdp::MDP, varname::AbstractString, minval::Real, maxval::Real)
   if haskey(mdp.actionmap, varname)
     warn(string(
       "action variable ", varname, " already exists in MDP object, ",
       "replacing existing variable definition"))
   end
-  mdp.actionmap[varname] = RangeVar(varname, float64(minval), float64(maxval))
+  mdp.actionmap[varname] = RangeVar(varname, Float64(minval), Float64(maxval))
 end
 
-function actionvariable!(mdp::MDP, varname::String, values::Vector)
+function actionvariable!(mdp::MDP, varname::AbstractString, values::Vector)
   if haskey(mdp.actionmap, varname)
     warn(string(
       "action variable ", varname, " already exists in MDP object, ",

@@ -20,9 +20,9 @@ end
 
 function getspace(
     dim::Int64,
-    args::Vector{String},
-    lazymap::Dict{String, LazyVar},
-    discmap::Dict{String, LazyDiscrete})
+    args::Vector{ASCIIString},
+    lazymap::Dict{AbstractString, LazyVar},
+    discmap::Dict{AbstractString, LazyDiscrete})
 
   space = Array(Vector{Float64}, dim)
   for ivar in 1:length(args)
@@ -30,9 +30,9 @@ function getspace(
     lazy = lazymap[var]
 
     if isa(lazy, RangeVar)
-      space[ivar] = [lazy.minval : discmap[var].step : lazy.maxval]
+      space[ivar] = collect(lazy.minval : discmap[var].step : lazy.maxval)
     elseif isa(lazy, ValuesVar)
-      space[ivar] = float64([1:length(lazy.values)])  # map to indices
+      space[ivar] = map(Float64, collect(1:length(lazy.values)))  # map to indices
     else
       error(string(
         "unknown state/action variable definition type for ", var))
@@ -46,8 +46,8 @@ end
 # Returns the actual variable from GridInterpolations indices
 function getvar(
     grid::RectangleGrid,
-    map::Dict{String, LazyVar},
-    argnames::Vector{String},
+    map::Dict{AbstractString, LazyVar},
+    argnames::Vector{ASCIIString},
     index::Int64)
 
   raw = ind2x(grid, index)
@@ -58,7 +58,7 @@ function getvar(
     if isa(lazy, RangeVar)
       var[ivar] = raw[ivar]
     elseif isa(lazy, ValuesVar)
-      var[ivar] = lazy.values[raw[ivar]]
+      var[ivar] = lazy.values[Int64(raw[ivar])]
     else
       error(string(
         "unknown state/action variable definition type for ", argnames[ivar]))
@@ -71,9 +71,8 @@ end
 
 # Inverse of getvar; returns the GridInterpolations index for a state
 function getidx(
-    grid::RectangleGrid,
-    map::Dict{String, LazyVar},
-    argnames::Vector{String},
+    map::Dict{AbstractString, LazyVar},
+    argnames::Vector{ASCIIString},
     state::Vector)
 
   idx = Array(Float64, length(state))
@@ -99,7 +98,7 @@ function transition(
     vi::ValueIteration,
     state::Vector,
     action::Vector,
-    stateargnames::Vector{String})
+    stateargnames::Vector{ASCIIString})
 
   results = mdp.transition.fn(state..., action...)
   nresults = length(results)
@@ -107,7 +106,7 @@ function transition(
   interps = [
     interpolants(
       vi.stategrid,
-      getidx(vi.stategrid, mdp.statemap, stateargnames, results[i][1]))
+      getidx(mdp.statemap, stateargnames, results[i][1]))
     for i in 1:nresults]
 
   nstateps = 0
@@ -135,7 +134,7 @@ function reward(mdp::MDP, state::Vector, action::Vector)
 end
 
 function segment(n::Int64, u::UnitRange)
-    chunks = {}
+    chunks = []
 
     cov = u.stop - u.start
     stride = int(floor((u.stop - u.start) / (n-1)))

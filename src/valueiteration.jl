@@ -13,10 +13,10 @@ const NThreads = CPU_CORES / 2
 
 type LazyDiscrete
 
-  varname::String
+  varname::AbstractString
   step::Float64
 
-  LazyDiscrete(varname::String, step::Float64) = new(varname, step)
+  LazyDiscrete(varname::AbstractString, step::Float64) = new(varname, step)
 
 end
 
@@ -30,8 +30,8 @@ type SerialValueIteration <: ValueIteration
   tol::Float64
   discount::Float64
 
-  statemap::Dict{String, LazyDiscrete}
-  actionmap::Dict{String, LazyDiscrete}
+  statemap::Dict{AbstractString, LazyDiscrete}
+  actionmap::Dict{AbstractString, LazyDiscrete}
   stategrid::RectangleGrid
   actiongrid::RectangleGrid
 
@@ -42,11 +42,11 @@ type SerialValueIteration <: ValueIteration
       discount::Real=Discount) =
     new(
       verbose,
-      int64(maxiter),
+      Int64(maxiter),
       tol,
-      float64(discount),
-      Dict{String, LazyDiscrete}(),
-      Dict{String, LazyDiscrete}(),
+      Float64(discount),
+      Dict{AbstractString, LazyDiscrete}(),
+      Dict{AbstractString, LazyDiscrete}(),
       RectangleGrid(),
       RectangleGrid())
 
@@ -61,8 +61,8 @@ type ParallelValueIteration <: ValueIteration
   tol::Float64
   discount::Float64
 
-  statemap::Dict{String, LazyDiscrete}
-  actionmap::Dict{String, LazyDiscrete}
+  statemap::Dict{AbstractString, LazyDiscrete}
+  actionmap::Dict{AbstractString, LazyDiscrete}
   stategrid::RectangleGrid
   actiongrid::RectangleGrid
 
@@ -73,13 +73,13 @@ type ParallelValueIteration <: ValueIteration
       tol::Float64=Tol,
       discount::Real=Discount) =
     new(
-      int64(nthreads),
+      Int64(nthreads),
       verbose,
-      int64(maxiter),
+      Int64(maxiter),
       tol,
-      float64(discount),
-      Dict{String, LazyDiscrete}(),
-      Dict{String, LazyDiscrete}(),
+      Float64(discount),
+      Dict{AbstractString, LazyDiscrete}(),
+      Dict{AbstractString, LazyDiscrete}(),
       RectangleGrid(),
       RectangleGrid())
 
@@ -106,22 +106,22 @@ type ValueIterationSolution <: Solution
 
 end
 
-function discretize_statevariable!(vi::ValueIteration, varname::String, step::Real)
+function discretize_statevariable!(vi::ValueIteration, varname::AbstractString, step::Real)
   if haskey(vi.statemap, varname)
     warn(string(
       "state variable ", varname, " already discretized in ValueIteration object, ",
       "replacing existing discretization scheme"))
   end
-  vi.statemap[varname] = LazyDiscrete(varname, float64(step))
+  vi.statemap[varname] = LazyDiscrete(varname, Float64(step))
 end
 
-function discretize_actionvariable!(vi::ValueIteration, varname::String, step::Real)
+function discretize_actionvariable!(vi::ValueIteration, varname::AbstractString, step::Real)
   if haskey(vi.actionmap, varname)
     warn(string(
       "action variable ", varname, " already discretized in ValueIteration object, ",
       "replacing existing discretization scheme"))
   end
-  vi.actionmap[varname] = LazyDiscrete(varname, float64(step))
+  vi.actionmap[varname] = LazyDiscrete(varname, Float64(step))
 end
 
 function getpolicy(mdp::MDP, solution::ValueIterationSolution)
