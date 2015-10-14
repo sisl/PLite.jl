@@ -16,16 +16,3 @@ In Depth Documentation
   Problem definition <definition>
   Solver selection <solver>
   Solution <solution>
-
-Todos
-=====
-
-* Short-term
-
-  - [ ] add Jupyter notebook examples
-  - [ ] include generic unit tests for solvers
-  - [ ] add support for pomdps (qmdp and fib)
-
-* Medium-term
-
-  - [ ] link with pomdps.jl
