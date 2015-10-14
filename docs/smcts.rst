@@ -80,7 +80,7 @@ The syntax for using a serial MCTS solver is similar to that of the serial value
 
   reward!(mdp,
     ["x", "goal", "move"],
-    function myreward(x::Float64, goal::String, move::String)
+    function myreward(x::Float64, goal::AbstractString, move::AbstractString)
       if goal == "yes" && move == "stop"
         return 1
       else

@@ -89,12 +89,12 @@ Below are two comprehensive listings that define the simple MDP example given ab
                                          # note (s,a,s') order
     function mytransition(
         x::Float64,
-        goal::String,
-        move::String,
+        goal::AbstractString,
+        move::AbstractString,
         xp::Float64,
-        goalp::String)
+        goalp::AbstractString)
 
-      function internaltransition(x::Float64, goal::String, move::String)
+      function internaltransition(x::Float64, goal::AbstractString, move::AbstractString)
         function isgoal(x::Float64)
           if abs(x - MaxX / 2) < StepX
             return "yes"
@@ -156,7 +156,7 @@ Below are two comprehensive listings that define the simple MDP example given ab
   reward!(mdp,
     ["x", "goal", "move"],  # note (s,a) order
                             # note consistency of variables order with transition
-    function myreward(x::Float64, goal::String, move::String)
+    function myreward(x::Float64, goal::AbstractString, move::AbstractString)
       if goal == "yes" && move == "stop"
         return 1
       else
@@ -244,7 +244,7 @@ Below are two comprehensive listings that define the simple MDP example given ab
 
   reward!(mdp,
     ["x", "goal", "move"],
-    function myreward(x::Float64, goal::String, move::String)
+    function myreward(x::Float64, goal::AbstractString, move::AbstractString)
       if goal == "yes" && move == "stop"
         return 1
       else

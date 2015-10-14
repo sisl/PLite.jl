@@ -84,7 +84,7 @@ We consider a quick and dirty example of running the exact same code as in the M
 
   reward!(mdp,
     ["x", "goal", "move"],
-    function myreward(x::Float64, goal::String, move::String)
+    function myreward(x::Float64, goal::AbstractString, move::AbstractString)
       if goal == "yes" && move == "stop"
         return 1
       else

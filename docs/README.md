@@ -124,10 +124,10 @@ An example of a *T*(*s*, *a*, *s*') type transition function is as follows. Here
 ```julia
 function mytransition(
     x::Float64,
-    goal::String,
-    move::String,
+    goal::AbstractString,
+    move::AbstractString,
     xp::Float64,
-    goalp::String)
+    goalp::AbstractString)
 ```
 
 the array of (ordered) argument names is `["x", "goal", "move", "x", "goal"]` rather than `["x", "goal", "move", "xp", "goalp"]`. Below is the full listing that defines the transition for `mdp`.
@@ -138,12 +138,12 @@ transition!(mdp,
                                        # note (s,a,s') order
   function mytransition(
       x::Float64,
-      goal::String,
-      move::String,
+      goal::AbstractString,
+      move::AbstractString,
       xp::Float64,
-      goalp::String)
+      goalp::AbstractString)
 
-    function internaltransition(x::Float64, goal::String, move::String)
+    function internaltransition(x::Float64, goal::AbstractString, move::AbstractString)
       function isgoal(x::Float64)
         if abs(x - MaxX / 2) < StepX
           return "yes"
@@ -270,7 +270,7 @@ The process of defining the reward function is similar to that for the *T*(*s*, 
 reward!(mdp,
   ["x", "goal", "move"],  # note (s,a) order
                           # note consistency of variables order with transition
-  function myreward(x::Float64, goal::String, move::String)
+  function myreward(x::Float64, goal::AbstractString, move::AbstractString)
     if goal == "yes" && move == "stop"
       return 1
     else
@@ -370,12 +370,12 @@ transition!(mdp,
                                        # note (s,a,s') order
   function mytransition(
       x::Float64,
-      goal::String,
-      move::String,
+      goal::AbstractString,
+      move::AbstractString,
       xp::Float64,
-      goalp::String)
+      goalp::AbstractString)
 
-    function internaltransition(x::Float64, goal::String, move::String)
+    function internaltransition(x::Float64, goal::AbstractString, move::AbstractString)
       function isgoal(x::Float64)
         if abs(x - MaxX / 2) < StepX
           return "yes"
@@ -437,7 +437,7 @@ transition!(mdp,
 reward!(mdp,
   ["x", "goal", "move"],  # note (s,a) order
                           # note consistency of variables order with transition
-  function myreward(x::Float64, goal::String, move::String)
+  function myreward(x::Float64, goal::AbstractString, move::AbstractString)
     if goal == "yes" && move == "stop"
       return 1
     else
@@ -525,7 +525,7 @@ transition!(mdp,
 
 reward!(mdp,
   ["x", "goal", "move"],
-  function myreward(x::Float64, goal::String, move::String)
+  function myreward(x::Float64, goal::AbstractString, move::AbstractString)
     if goal == "yes" && move == "stop"
       return 1
     else
@@ -625,7 +625,7 @@ transition!(mdp,
 
 reward!(mdp,
   ["x", "goal", "move"],
-  function myreward(x::Float64, goal::String, move::String)
+  function myreward(x::Float64, goal::AbstractString, move::AbstractString)
     if goal == "yes" && move == "stop"
       return 1
     else
