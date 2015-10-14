@@ -68,6 +68,7 @@ Below are two comprehensive listings that define the simple MDP example given ab
   * MDP with *T*(*s*, *a*, *s*') type transition
 
 ::
+
   using PLite
 
   # constants
