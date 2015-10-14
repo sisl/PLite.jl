@@ -14,6 +14,6 @@ In Depth Documentation
 
   Installation <installation>
   Problem definition <definition>
-  Solver selection <solvers>
+  Solvers <solvers>
   Solution <solution>
-  Example <examples>
+  Examples <examples>
