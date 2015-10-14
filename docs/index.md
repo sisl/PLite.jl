@@ -1,33 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
-
-- [PLite.jl](#plitejl)
-  - [Problem definition](#problem-definition)
-    - [MDP](#mdp)
-      - [State space](#state-space)
-      - [Action space](#action-space)
-      - [Transition](#transition)
-        - [*T*(*s*, *a*, *s*') type transition](#ts-a-s-type-transition)
-        - [*T*(*s*, *a*) type transition](#ts-a-type-transition)
-      - [Reward](#reward)
-  - [Solver selection](#solver-selection)
-    - [Serial Value iteration](#serial-value-iteration)
-      - [Infinite horizon with discount](#infinite-horizon-with-discount)
-      - [Finite horizon without discount](#finite-horizon-without-discount)
-      - [Example](#example)
-        - [MDP with *T*(*s*, *a*, *s*') type transition](#mdp-with-ts-a-s-type-transition)
-        - [MDP with *T*(*s*, *a*) type transition](#mdp-with-ts-a-type-transition)
-    - [Parallel Value Iteration](#parallel-value-iteration)
-    - [Monte-Carlo Tree Search](#monte-carlo-tree-search)
-  - [Solution](#solution)
-- [Todos](#todos)
-  - [Short-term](#short-term)
-  - [Medium-term](#medium-term)
-- [Footnotes](#footnotes)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # PLite.jl
 
 PLite, pronounced "polite,"<sup>[1](#myfootnote1)</sup> is a Julia-based modeling system for Markov decision processes. PLite turns Julia into a modeling language, allowing the stochastic problem to be specified using simple Julia expression syntax.
@@ -287,7 +257,7 @@ reward!(mdp,
 
 PLite is intended to provide several solvers for any MDP problem, ranging from classic dynamic programming methods such as value iteration, policy iteration, and policy evaluation to approximate, online, and direct policy search methods. Eventually, we'll include learning algorithms, including cooler ones like [deep reinforcement learning with double Q-learning](http://arxiv.org/abs/1509.06461) with support for [distributed computing](http://arxiv.org/abs/1507.04296).
 
-Until then, we just have to play with good o' value iteration in both its serial and parallel flavors.
+Until then, we just have to play with good o' value iteration in both its serial and parallel flavors, as well as serial implementation of the finite Monte-Carlo tree search algorithm.
 
 ### Serial Value iteration
 
