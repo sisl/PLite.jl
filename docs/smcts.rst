@@ -96,7 +96,7 @@ The syntax for using a serial MCTS solver is similar to that of the serial value
   # generate results
   solution = solve(mdp, solver)
 
-There are four keyword arguments we can use to instantiate the solver: ``niter``, ``maxdepth``, ``exex``, and ``discount``. These parameters correspond to the number of iterations during each action selection when querying the MCTS policy object (see more in the [Solution](#solution) section), the maximum depth of the search tree used in MCTS, a constant that varies the exploration-exploitation preference, and the simulation/rollout discount factor, respectively.
+There are four keyword arguments we can use to instantiate the solver: ``niter``, ``maxdepth``, ``exex``, and ``discount``. These parameters correspond to the number of iterations during each action selection when querying the MCTS policy object (see more in the solution_ section), the maximum depth of the search tree used in MCTS, a constant that varies the exploration-exploitation preference, and the simulation/rollout discount factor, respectively.
 
 The default parameters are
 

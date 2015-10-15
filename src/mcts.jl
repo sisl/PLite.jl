@@ -95,8 +95,8 @@ end
 
 # returned policy is "live" and grows the search tree
 function getpolicy(mdp::MDP, smcts::SerialMCTS)
-  function policy(state::Vector)
-    return smctsaction!(mdp, smcts, state)
+  function policy(actualstate...)
+    return smctsaction!(mdp, smcts, collect(actualstate))
   end
   return policy
 end

@@ -170,16 +170,16 @@ end
 function getvar(
     map::Dict{AbstractString, LazyVar},
     argnames::Vector{ASCIIString},
-    raw::Vector{Float64})
+    gridstate::Vector{Float64})
 
-  var = Array(Any, length(raw))
+  var = Array(Any, length(gridstate))
 
-  for ivar in 1:length(raw)
+  for ivar in 1:length(gridstate)
     lazy = map[argnames[ivar]]
     if isa(lazy, RangeVar)
-      var[ivar] = raw[ivar]
+      var[ivar] = gridstate[ivar]
     elseif isa(lazy, ValuesVar)
-      var[ivar] = lazy.values[Int64(raw[ivar])]
+      var[ivar] = lazy.values[Int64(gridstate[ivar])]
     else
       error(string(
         "unknown state/action variable definition type for ", argnames[ivar]))
