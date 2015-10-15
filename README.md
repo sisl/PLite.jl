@@ -4,10 +4,10 @@ PLite, pronounced "polite,"<sup>[1](#myfootnote1)</sup> is a Julia-based modelin
 
 Installation can be done from the Julia console as follows.
 ```julia
-julia> Pkg.clone("https://github.com/haoyio/PLite.jl")
+julia> Pkg.clone("https://github.com/sisl/PLite.jl")
 ```
 
-Detailed documentation and examples for PLite.jl can be found [here](http://plitejl.readthedocs.org/en/latest/index.html). A .md version of the readme can also be found in the `docs` [directory](https://github.com/haoyio/PLite.jl/tree/master/docs).
+Detailed documentation and examples for PLite.jl can be found [here](http://plitejl.readthedocs.org/en/latest/index.html). A .md version of the readme can also be found in the `docs` [directory](https://github.com/sisl/PLite.jl/tree/master/docs).
 
 # Todos
 
