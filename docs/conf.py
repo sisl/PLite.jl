@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# Convex.jl documentation build configuration file, created by
-# sphinx-quickstart on Fri Jan  2 03:59:02 2015.
+# PLite.jl documentation build configuration file, created by
+# sphinx-quickstart on Fri Oct 12 03:59:02 2015.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
