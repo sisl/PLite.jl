@@ -137,7 +137,7 @@ function segment(n::Int64, u::UnitRange)
     chunks = []
 
     cov = u.stop - u.start
-    stride = int(floor((u.stop - u.start) / (n-1)))
+    stride = round(Int, floor((u.stop - u.start) / (n-1)))
     for i = 1:(n-1)
         si = u.start + (i-1)*stride
         ei = si + stride - 1

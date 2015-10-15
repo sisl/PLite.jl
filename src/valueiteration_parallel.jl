@@ -25,19 +25,19 @@ function internalsolve(mdp::MDP, pvi::ParallelValueIteration)
     Float64,
     (nstates),
     init = S -> S[localindexes(S)] = 0.0,
-    pids = [1:pvi.nthreads])
+    pids = collect(1:pvi.nthreads))
 
   vnew = SharedArray(
     Float64,
     (nstates),
     init = S -> S[localindexes(S)] = 0.0,
-    pids = [1:pvi.nthreads])
+    pids = collect(1:pvi.nthreads))
 
   qval = SharedArray(
     Float64,
     (nactions, nstates),
     init = S -> S[localindexes(S)] = 0.0,
-    pids = [1:pvi.nthreads])
+    pids = collect(1:pvi.nthreads))
 
   lst = segment(pvi.nthreads, 1:nstates)
 
