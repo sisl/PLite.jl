@@ -12,7 +12,6 @@ Detailed documentation and examples for PLite.jl can be found [here](http://plit
 # Todos
 
 ## Short-term
-* [ ] add Jupyter notebook examples
 * [ ] include generic unit tests for solvers
 * [ ] add support for pomdps (qmdp and fib)
 
