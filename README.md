@@ -7,7 +7,7 @@ Installation can be done from the Julia console as follows.
 julia> Pkg.clone("https://github.com/sisl/PLite.jl")
 ```
 
-Detailed documentation and examples for PLite.jl can be found [here](http://plitejl.readthedocs.org/en/latest/index.html). A .md version of the readme can also be found in the `docs` [directory](https://github.com/sisl/PLite.jl/tree/master/docs).
+Detailed documentation and examples for PLite.jl can be found [here](http://sislplitejl.readthedocs.org/en/latest/index.html). A .md version of the readme can also be found in the `docs` [directory](https://github.com/sisl/PLite.jl/tree/master/docs).
 
 # Todos
 
