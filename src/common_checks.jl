@@ -118,7 +118,7 @@ function randargs(mdp::MDP)
     elseif haskey(mdp.actionmap, argname)
       args[iarg] = lazySample(mdp.actionmap[argname])
     else
-      error(string("variable ", lazyvar.varname, " has not been defined"))
+      #error(string("variable ", lazyvar.varname, " has not been defined"))
     end
   end
   args
